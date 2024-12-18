@@ -1,10 +1,20 @@
+import unittest
 from lib.DataTransformer import transform_intraday
 
-def test_transform_intraday():
-    input_data = {'symbol': 'AAPL', 'prices': [{'datetime': '2024-01-01', 'price': 150}]}
-    expected = {'ticker': ['AAPL'], 'datetime': ['2024-01-01'], 'price': [150]}
+class TestDataTransformers(unittest.TestCase):
 
-    result = transform_intraday('AAPL', input_data)
-    assert result['ticker'] == expected['ticker']
-    assert result['datetime'] == expected['datetime']
-    assert result['price'] == expected['price']
+    def test_transform_intraday(self):
+        input_data = {'symbol': 'AAPL', 'prices': [{'datetime': '2024-01-01', 'price': 150}]}
+        expected = {
+            'ticker': ['AAPL'],
+            'datetime': ['2024-01-01'],
+            'price': [150]
+        }
+
+        result = transform_intraday('AAPL', input_data)
+        self.assertEqual(result['ticker'], expected['ticker'])
+        self.assertEqual(result['datetime'], expected['datetime'])
+        self.assertEqual(result['price'], expected['price'])
+
+if __name__ == "__main__":
+    unittest.main()
