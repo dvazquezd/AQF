@@ -5,17 +5,24 @@ from lib.DataTransformer import transform_intraday
 class TestDataTransformers(unittest.TestCase):
 
     def test_transform_intraday(self):
-        input_data = {'symbol': 'AAPL', 'prices': [{'datetime': '2024-01-01', 'price': 150}]}
-        expected = {
-            'ticker': ['AAPL'],
-            'datetime': ['2024-01-01'],
-            'price': [150]
+        # Datos de entrada corregidos
+        input_data = {
+            'symbol': 'AAPL',
+            'prices': [
+                {'datetime': '2024-01-01T10:00:00', 'price': 150}
+            ]
         }
+        expected = pd.DataFrame({
+            'ticker': ['AAPL'],
+            'datetime': ['2024-01-01 10:00:00'],
+            'price': [150]
+        })
 
+        # Ejecutar la función
         result = transform_intraday('AAPL', input_data)
-        self.assertEqual(result['ticker'], expected['ticker'])
-        self.assertEqual(result['datetime'], expected['datetime'])
-        self.assertEqual(result['price'], expected['price'])
+
+        # Verificar resultado
+        pd.testing.assert_frame_equal(result.reset_index(drop=True), expected)
 
 
 def transform_intraday(symbol, data):
