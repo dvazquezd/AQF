@@ -3,12 +3,9 @@ import pandas as pd
 from lib.ApiClient import ApiClient
 import lib.DataTransformer as transf
 import lib.BricMortar as bm
-import tensorflow
-import keras
-
 
 # Variables y configuraciones
-historical_needed = True
+historical_needed = False
 symbols = ['NVDA']
 periods = [20, 40, 200]
 economic_indicators = ['unemployment', 'nonfarm_payroll', 'cpi']
