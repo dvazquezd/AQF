@@ -5,7 +5,6 @@ from lib.DataTransformer import transform_intraday
 class TestDataTransformers(unittest.TestCase):
 
     def test_transform_intraday(self):
-        # Datos de entrada corregidos
         input_data = {
             'symbol': 'AAPL',
             'prices': [
@@ -14,7 +13,7 @@ class TestDataTransformers(unittest.TestCase):
         }
         expected = pd.DataFrame({
             'ticker': ['AAPL'],
-            'datetime': ['2024-01-01 10:00:00'],
+            'datetime': ['2024-01-01 10:00:00'],  # Formato ajustado
             'price': [150]
         })
 
@@ -24,20 +23,19 @@ class TestDataTransformers(unittest.TestCase):
         # Verificar resultado
         pd.testing.assert_frame_equal(result.reset_index(drop=True), expected)
 
+    def transform_economic_data(data):
+        if 'data' not in data:
+            raise ValueError("Invalid data format: 'data' key is missing")
 
-def transform_intraday(symbol, data):
-    if 'prices' not in data:
-        raise ValueError("Invalid data format: 'prices' key is missing")
+        records = [
+            {
+                'datetime': pd.to_datetime(entry['date']),
+                'value': float(entry['value'])
+            }
+            for entry in data['data']
+        ]
+        return pd.DataFrame(records)
 
-    records = [
-        {
-            'ticker': symbol,
-            'datetime': pd.to_datetime(entry['datetime']).strftime('%Y-%m-%d %H:%M'),
-            'price': entry['price']
-        }
-        for entry in data['prices']
-    ]
-    return pd.DataFrame(records)
 
 
 

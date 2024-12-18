@@ -10,11 +10,11 @@ class TestMain(unittest.TestCase):
         self.mock_client = MagicMock()
 
     def test_load_economics(self):
-        # Simular respuesta de la API para indicadores económicos
+        # Datos simulados corregidos
         self.mock_client.get_economic_indicator.return_value = {
             'data': [
-                {'year_month': '2024-01', 'value': 3.5},
-                {'year_month': '2024-02', 'value': 3.6}
+                {'date': '2024-01-01', 'value': 3.5},
+                {'date': '2024-02-01', 'value': 3.6}
             ]
         }
 
@@ -22,9 +22,9 @@ class TestMain(unittest.TestCase):
         indicators = ['unemployment']
         df_unemployment, _, _ = load_economics(self.mock_client, indicators)
 
-        # Comprobar los resultados
+        # Verificar resultado
         self.assertFalse(df_unemployment.empty)
-        self.assertEqual(df_unemployment.loc[0, 'year_month'], '2024-01')
+        self.assertEqual(df_unemployment.loc[0, 'datetime'], '2024-01-01')
         self.assertEqual(df_unemployment.loc[0, 'value'], 3.5)
 
     def test_combine_data(self):
