@@ -134,32 +134,37 @@ def retrieve_data(all_dfs):
     return dh_ticker, dh_sma, dh_rsi, dh_mac, df_news
 
 
-if historical_needed:
-    months = bm.get_months(2022,historical_needed)
-    df_ticker, df_sma, df_rsi, df_macd = load_data(client, symbols, historical_needed,months)
-    df_unemployment, df_nonfam, df_cpi = load_economics(client, economic_indicators)
-    df_news = load_news(client,months, topics)
-    bm.write_csv(df_news,'data/df_news.csv')
-    df_aqf = merge_datasets(df_ticker, df_macd, df_rsi, df_sma, df_unemployment, df_nonfam, df_cpi)
-    bm.write_csv(df_aqf,'data/df_aqf.csv')
-else:
-    months = bm.get_months(2024,historical_needed)
-    dh_ticker, dh_sma, dh_rsi, dh_mac, dh_news = retrieve_data(all_dfs)
-    df_ticker, df_sma, df_rsi, df_macd = load_data(client, symbols, historical_needed,months)
-    df_unemployment, df_nonfam, df_cpi = load_economics(client, economic_indicators)
-    df_news = load_news(client,months, topics)
-    
-    df_ticker = combine_data(df_ticker, dh_ticker, subset_columns=['ticker','datetime'])
-    df_macd = combine_data(df_macd, dh_mac, subset_columns=['ticker','datetime'])
-    df_sma = combine_data(df_sma, dh_sma, subset_columns=['ticker','datetime','period'])
-    df_rsi = combine_data(df_rsi, dh_rsi, subset_columns=['ticker','datetime','period'])
-    df_news = combine_data(df_news, dh_news, subset_columns=['title','time_published','ticker','affected_topic'])
+def main():
+    if historical_needed:
+        months = bm.get_months(2022,historical_needed)
+        df_ticker, df_sma, df_rsi, df_macd = load_data(client, symbols, historical_needed,months)
+        df_unemployment, df_nonfam, df_cpi = load_economics(client, economic_indicators)
+        df_news = load_news(client,months, topics)
+        bm.write_csv(df_news,'data/df_news.csv')
+        df_aqf = merge_datasets(df_ticker, df_macd, df_rsi, df_sma, df_unemployment, df_nonfam, df_cpi)
+        bm.write_csv(df_aqf,'data/df_aqf.csv')
+    else:
+        months = bm.get_months(2024,historical_needed)
+        dh_ticker, dh_sma, dh_rsi, dh_mac, dh_news = retrieve_data(all_dfs)
+        df_ticker, df_sma, df_rsi, df_macd = load_data(client, symbols, historical_needed,months)
+        df_unemployment, df_nonfam, df_cpi = load_economics(client, economic_indicators)
+        df_news = load_news(client,months, topics)
+        
+        df_ticker = combine_data(df_ticker, dh_ticker, subset_columns=['ticker','datetime'])
+        df_macd = combine_data(df_macd, dh_mac, subset_columns=['ticker','datetime'])
+        df_sma = combine_data(df_sma, dh_sma, subset_columns=['ticker','datetime','period'])
+        df_rsi = combine_data(df_rsi, dh_rsi, subset_columns=['ticker','datetime','period'])
+        df_news = combine_data(df_news, dh_news, subset_columns=['title','time_published','ticker','affected_topic'])
 
-    bm.write_csv(df_ticker,'data/df_ticker.csv')
-    bm.write_csv(df_macd,'data/df_macd.csv')
-    bm.write_csv(df_sma,'data/df_sma.csv')
-    bm.write_csv(df_rsi,'data/df_rsi.csv')
-    bm.write_csv(df_news,'data/df_news.csv')
+        bm.write_csv(df_ticker,'data/df_ticker.csv')
+        bm.write_csv(df_macd,'data/df_macd.csv')
+        bm.write_csv(df_sma,'data/df_sma.csv')
+        bm.write_csv(df_rsi,'data/df_rsi.csv')
+        bm.write_csv(df_news,'data/df_news.csv')
 
-    df_aqf = merge_datasets(df_ticker, df_macd, df_rsi, df_sma, df_unemployment, df_nonfam, df_cpi)
-    bm.write_csv(df_aqf,'data/df_aqf.csv')
+        df_aqf = merge_datasets(df_ticker, df_macd, df_rsi, df_sma, df_unemployment, df_nonfam, df_cpi)
+        bm.write_csv(df_aqf,'data/df_aqf.csv')
+
+
+if __name__ == "__main__":
+    main()
