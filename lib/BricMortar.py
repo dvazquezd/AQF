@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 import matplotlib.pyplot as plt
 import json
+import os
 
 def generate_month_list(start_year, end_year=None, frequency='monthly'):
     '''
@@ -78,6 +79,9 @@ def read_csv(file_path):
 
 def write_csv(df, file_path):
     """Sobrescribe un archivo CSV con el nuevo DataFrame."""
+    directory = os.path.dirname(file_path)
+    if not os.path.exists(directory):
+        os.makedirs(directory)  # Crear el directorio si no existe
     df.to_csv(file_path, index=False)
 
 

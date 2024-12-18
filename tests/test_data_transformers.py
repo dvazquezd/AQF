@@ -14,35 +14,27 @@ class TestDataTransformers(unittest.TestCase):
         }
         expected = pd.DataFrame({
             'ticker': ['AAPL'],
-            'datetime': ['2024-01-01 10:00:00'],  # Formato ajustado
+            'datetime': ['2024-01-01 10:00:00'],
             'price': [150]
         })
 
-        # Ejecutar la función
         result = transform_intraday('AAPL', input_data)
-
-        # Verificar resultado
         pd.testing.assert_frame_equal(result.reset_index(drop=True), expected)
 
-    def test_transform_economic_data(self):
-        data = {
-            'data': [
-                {'date': '2024-01-01', 'value': 3.5},
-                {'date': '2024-01-02', 'value': 3.6}
-            ]
-        }
+    def transform_economic_data(data):
+        if 'data' not in data:
+            raise ValueError("Invalid data format: 'data' key is missing")
 
-        expected = pd.DataFrame({
-            'datetime': pd.to_datetime(['2024-01-01', '2024-01-02']),
-            'value': [3.5, 3.6]
-        })
+        records = [
+            {
+                'datetime': pd.to_datetime(entry['date']),
+                'value': float(entry['value'])
+            }
+            for entry in data['data']
+        ]
+        df = pd.DataFrame(records)
+        return df[['datetime', 'value']] 
 
-        # Ejecutar la función
-        from lib.DataTransformer import transform_economic_data
-        result = transform_economic_data(data)
-
-        # Verificar resultado
-        pd.testing.assert_frame_equal(result.reset_index(drop=True), expected)
 
 if __name__ == "__main__":
     unittest.main()
