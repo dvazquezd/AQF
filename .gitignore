@@ -1,0 +1,4 @@
+# Ignorar todas las carpetas __pycache__ en cualquier ubicación
+__pycache__/
+lib/__pycache__/
+data/
