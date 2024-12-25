@@ -5,7 +5,7 @@ import lib.DataTransformer as transf
 import lib.BricMortar as bm
 
 # Variables y configuraciones
-historical_needed = False
+historical_needed = True
 symbols = ['NVDA']
 periods = [20, 40, 200]
 economic_indicators = ['unemployment', 'nonfarm_payroll', 'cpi']
