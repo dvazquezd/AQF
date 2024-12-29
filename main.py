@@ -5,7 +5,7 @@ import lib.DataTransformer as transf
 import lib.BricMortar as bm
 
 # Variables y configuraciones
-historical_needed = True
+historical_needed = False
 symbols = ['NVDA']
 periods = [20, 40, 200]
 economic_indicators = ['unemployment', 'nonfarm_payroll', 'cpi']
@@ -14,9 +14,10 @@ all_dfs = ['df_macd','df_rsi','df_sma','df_ticker','df_news']
 topics = ['technology','blockchain','financial_markets','economy_macro','economy_monetary','economy_fiscal']
 
 
-client = ApiClient()
-
 def combine_data(df_historical,df_current,subset_columns):
+   '''
+        Combine same datasets types deleting duplicates
+   '''
    df_combined = pd.concat([df_historical, df_current]).drop_duplicates(subset=subset_columns, keep="last")
    return df_combined
 
@@ -135,8 +136,11 @@ def retrieve_data(all_dfs):
 
 
 def main():
+
+    client = ApiClient()
+
     if historical_needed:
-        months = bm.get_months(2022,historical_needed)
+        months = bm.get_months(2024,historical_needed)
         df_ticker, df_sma, df_rsi, df_macd = load_data(client, symbols, historical_needed,months)
         df_unemployment, df_nonfam, df_cpi = load_economics(client, economic_indicators)
         df_news = load_news(client,months, topics)

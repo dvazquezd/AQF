@@ -42,7 +42,7 @@ def transform_sma(symbol, data, period):
         {
             'ticker': symbol,
             'datetime':   pd.to_datetime(datetime_str).strftime('%Y-%m-%d %H:%M'),
-            'SMA': float(sma_data['SMA']),
+            'sma': float(sma_data['SMA']),
             'period': period  
         }
         for datetime_str, sma_data in data.items()
@@ -76,7 +76,7 @@ def transform_rsi(symbol, data, period):
         {
             'ticker': symbol,
             'datetime':  pd.to_datetime(datetime_str).strftime('%Y-%m-%d %H:%M'),
-            'RSI': float(rsi_data['RSI']),
+            'rsi': float(rsi_data['RSI']),
             'period': period 
         }
         for datetime_str, rsi_data in data.items()
