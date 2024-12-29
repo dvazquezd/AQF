@@ -7,13 +7,13 @@ import lib.BricMortar as bm
 
 def combine_data(df_historical,df_current,subset_columns):
    '''
-        Combine same datasets types deleting duplicates
+   Combine same datasets types deleting duplicates
    '''
    df_combined = pd.concat([df_historical, df_current]).drop_duplicates(subset=subset_columns, keep="last")
    return df_combined
 
 
-def load_data(dfs,client, symbols, historical_needed,months, periods):
+def load_data(dfs,client, symbols, months, periods):
     '''
     '''
     for symbol in symbols:
@@ -40,10 +40,6 @@ def load_data(dfs,client, symbols, historical_needed,months, periods):
                     h_rsi = transf.transform_rsi(symbol,json_data_rsi,period)
                     dfs['rsi'] = combine_data(dfs['rsi'], h_rsi, subset_columns=['ticker','datetime','period'])
 
-    if historical_needed:
-        for df in ['ticker','sma','macd','rsi']:
-            bm.write_csv(dfs[df],f'data/df_{df}.csv')
-
     return dfs
 
 
@@ -57,13 +53,13 @@ def load_economics(dfs, client, indicators):
             df_economic = transf.transform_economic_data(json_data)
             bm.write_csv(df_economic, f"data/df_{indicator}.csv")
             dfs[indicator] = df_economic
-            print(f"{indicator.capitalize()} data saved successfully!")
+            print(f'Getting data: {{\'function\': {indicator}}} saved successfully!')
         else:
             print(f"Error fetching data for {indicator}")
     return dfs 
 
 
-def load_news(dfs,client, months, topics, historical_needed):
+def load_news(dfs,client, months, topics):
     '''
     '''
     for month in months:
@@ -74,9 +70,6 @@ def load_news(dfs,client, months, topics, historical_needed):
                 h_news = transf.transform_news_data(json_data, topic)
                 dfs['news'] = combine_data(dfs['news'], h_news, subset_columns=['title','time_published','ticker','affected_topic'])
     
-    if historical_needed:
-        bm.write_csv( dfs['news'],'data/df_news.csv')
-
     return dfs
     
 
@@ -85,11 +78,9 @@ def transform_indicators(dfs, period, tech_indicator):
     '''
     df_transformed =  dfs[tech_indicator][dfs[tech_indicator]['period'] == period][['ticker', 'datetime', tech_indicator]].copy()
     df_transformed.rename(columns={tech_indicator: f'{tech_indicator}_{period}'},inplace = True)
-    print(df_transformed)
     return df_transformed
 
 
-# Preparar el dataset final
 def merge_datasets(dfs, periods, tec_columns, economic_columns):
     '''
     Prepara el dataset final combinando datos de cotización con indicadores técnicos y económicos.
@@ -101,7 +92,6 @@ def merge_datasets(dfs, periods, tec_columns, economic_columns):
 
     # Paso 2: Unir los datasets de indicadores técnicos al dataset de cotización
     dfs['merged_tec_info'] = dfs['ticker']
-    print(tec_columns.keys())
     for key, cols in tec_columns.items():
         dfs['merged_tec_info'] = pd.merge(dfs['merged_tec_info'], dfs[key][cols], on=['ticker', 'datetime'], how='left')
 
@@ -112,18 +102,15 @@ def merge_datasets(dfs, periods, tec_columns, economic_columns):
             on='year_month',
             how='left'
         )
-    
+             
     return dfs
 
 
 def retrieve_data(dfs):
     '''
     '''
-    dfs['ticker'] = bm.read_csv('data/df_ticker.csv')
-    dfs['macd'] = bm.read_csv('data/df_macd.csv')
-    dfs['rsi'] = bm.read_csv('data/df_rsi.csv')
-    dfs['sma'] = bm.read_csv('data/df_sma.csv')
-    dfs['news'] = bm.read_csv('data/df_news.csv')
+    for df in dfs.keys():
+        dfs[df] = bm.read_csv(f'data/df_{df}.csv')
 
     return dfs
 
@@ -143,18 +130,26 @@ def main():
     historical_needed = True
     symbols = ['NVDA']
     periods = [20, 40, 200]
-    technical_indicators = ['macd','rsi','sma']
+    #technical_indicators = ['macd','rsi','sma']
     economic_indicators = ['unemployment', 'nonfarm_payroll', 'cpi']
-    all_dfs = ['df_macd','df_rsi','df_sma','df_ticker','df_news']
-    topics = ['technology','blockchain','financial_markets','economy_macro','economy_monetary','economy_fiscal']
+    #all_dfs = ['df_macd','df_rsi','df_sma','df_ticker','df_news']
+    topics = ['technology']#,'blockchain','financial_markets','economy_macro','economy_monetary','economy_fiscal']
     dataframes = {'ticker': pd.DataFrame(),
                   'macd': pd.DataFrame(),
-                  'sma': pd.DataFrame(),
                   'rsi': pd.DataFrame(),
+                  'rsi_20': pd.DataFrame(),
+                  'rsi_40': pd.DataFrame(),
+                  'rsi_200': pd.DataFrame(),
+                  'sma': pd.DataFrame(),
+                  'sma_20': pd.DataFrame(),
+                  'sma_40': pd.DataFrame(),
+                  'sma_200': pd.DataFrame(),
                   'unemployment': pd.DataFrame(),
                   'cpi': pd.DataFrame(),
                   'nonfarm_payroll': pd.DataFrame(),
-                  'news': pd.DataFrame()}
+                  'news': pd.DataFrame(),
+                  'merged_tec_info': pd.DataFrame()}
+    h_dataframes = dataframes
     tec_columns = {
         'macd': ['ticker', 'datetime', 'MACD', 'MACD_Signal', 'MACD_Hist'],
         'rsi_200': ['ticker', 'datetime', 'rsi_200'],
@@ -174,23 +169,22 @@ def main():
     #Objects
     client = ApiClient()
 
-    months = bm.get_months(2024,historical_needed)
-    dataframes = load_data(dataframes,client, symbols, historical_needed,months, periods)
+    months = bm.get_months(2024, historical_needed)
+    dataframes = load_data(dataframes,client, symbols, months, periods)
     dataframes = load_economics(dataframes, client, economic_indicators)
-    dataframes = load_news(dataframes,client,months, topics, historical_needed)
+    dataframes = load_news(dataframes, client, months, topics)
     dataframes = merge_datasets(dataframes, periods, tec_columns, economic_columns)
 
-    if historical_needed:
-        h_dataframes = retrieve_data(dataframes)
+    if not historical_needed:
+        h_dataframes = retrieve_data(h_dataframes)
         #dataframes = combine_data(dataframes, h_dataframes)
     
+    print(dataframes)
     save_dataframes(dataframes)
 
 
 
-    '''
-
-       
+    '''  
         df_ticker = combine_data(df_ticker, dh_ticker, subset_columns=['ticker','datetime'])
         df_macd = combine_data(df_macd, dh_mac, subset_columns=['ticker','datetime'])
         df_sma = combine_data(df_sma, dh_sma, subset_columns=['ticker','datetime','period'])
