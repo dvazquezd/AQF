@@ -1,29 +1,33 @@
+import os
 import json
 import pandas as pd
-import DataTransformer as transf
-import BricMortar as bm
+from . import DataTransformer as transf
+from . import BricMortar as bm
 
 
 def combine_dataframes(df_historical,df_current,f_dataframes, combine_configuration):
    '''
    Combine same datasets types deleting duplicates
    '''
-   all_keys = df_current.keys()
+   all_keys = list(df_current.keys())
 
    for enconomic in ['unemployment','nonfarm_payroll','cpi']:
        f_dataframes[enconomic] = df_current[enconomic]
        all_keys.remove(enconomic)
        
-   for key in all_keys:
-       df_combined = pd.concat([df_historical[key], df_current[key]]).drop_duplicates(subset=combine_configuration[key], keep='last')
-       f_dataframes[key] = df_combined   
-   
+   for key in all_keys:        
+        df_combined = pd.concat([df_historical[key], df_current[key]]).drop_duplicates(subset=combine_configuration[key], keep='last')
+        if key == 'news':
+            f_dataframes[key] = df_combined.sort_values(by='time_published', ascending=True)   
+        else:
+            f_dataframes[key] = df_combined.sort_values(by='datetime', ascending=True)   
+
    return f_dataframes
 
 
 def combine_data(df_historical,df_current,subset_columns):
    '''
-        Combine same datasets types deleting duplicates
+    Combine same datasets types deleting duplicates
    '''
    df_combined = pd.concat([df_historical, df_current]).drop_duplicates(subset=subset_columns, keep='last')
    return df_combined
@@ -142,7 +146,9 @@ def save_dataframes(dfs):
 def load_config():
     '''
     '''
-    with open('../config/config.json', 'r') as config_file:
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Carpeta raíz (AQF)
+    CONFIG_PATH = os.path.join(BASE_DIR, 'config', 'config.json')
+    with open(CONFIG_PATH, 'r') as config_file:
         config = json.load(config_file)
 
     return config

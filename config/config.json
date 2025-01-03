@@ -35,18 +35,18 @@
         "nonfarm_payroll": "nonfarm",
         "unemployment": "unemployment"
     },
-    "combine_configuration": [
-        {"ticker": ["ticker", "datetime"]},
-        {"macd": ["ticker", "datetime"]},
-        {"rsi": ["ticker", "datetime", "period"]},
-        {"rsi_20": ["datetime"]},
-        {"rsi_40": ["datetime"]},
-        {"rsi_200": ["datetime"]},
-        {"sma": ["ticker", "datetime", "period"]},
-        {"sma_20": ["datetime"]},
-        {"sma_40": ["datetime"]},
-        {"sma_200": ["datetime"]},
-        {"news": ["title", "time_published", "ticker", "affected_topic"]},
-        {"merged_tec_info": ["ticker", "datetime"]}
-    ]
+    "combine_configuration": {
+        "ticker": ["ticker", "datetime"],
+        "macd": ["ticker", "datetime"],
+        "rsi": ["ticker", "datetime", "period"],
+        "rsi_20": ["datetime"],
+        "rsi_40": ["datetime"],
+        "rsi_200": ["datetime"],
+        "sma": ["ticker", "datetime", "period"],
+        "sma_20": ["datetime"],
+        "sma_40": ["datetime"],
+        "sma_200": ["datetime"],
+        "news": ["title", "time_published", "ticker", "affected_topic"],
+        "merged_tec_info": ["ticker", "datetime"]
+    }
 }

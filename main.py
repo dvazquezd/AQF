@@ -1,3 +1,5 @@
+import os
+import sys
 import pandas as pd
 import lib.BricMortar as bm
 import lib.DataLoader as dl
@@ -10,8 +12,6 @@ def main():
     #Objects
     client = ApiClient()
     config = dl.load_config()
-
-    print(config)
 
     # Variables y configuraciones
     historical_needed = config['historical_needed']
@@ -39,4 +39,5 @@ def main():
     dl.save_dataframes(f_dataframes)
 
 if __name__ == '__main__':
+    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
     main()
