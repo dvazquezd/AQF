@@ -1,0 +1,52 @@
+{
+    "historical_needed": false,
+    "symbols": ["NVDA"],
+    "periods": [20, 40, 200],
+    "economic_indicators": ["unemployment", "nonfarm_payroll", "cpi"],
+    "topics": ["technology", "blockchain", "financial_markets", "economy_macro", "economy_monetary", "economy_fiscal"],
+    "dataframes": {
+        "ticker": {},
+        "macd": {},
+        "rsi": {},
+        "rsi_20": {},
+        "rsi_40": {},
+        "rsi_200": {},
+        "sma": {},
+        "sma_20": {},
+        "sma_40": {},
+        "sma_200": {},
+        "unemployment": {},
+        "cpi": {},
+        "nonfarm_payroll": {},
+        "news": {},
+        "merged_tec_info": {}
+    },
+    "tec_columns": {
+        "macd": ["ticker", "datetime", "MACD", "MACD_Signal", "MACD_Hist"],
+        "rsi_200": ["ticker", "datetime", "rsi_200"],
+        "rsi_40": ["ticker", "datetime", "rsi_40"],
+        "rsi_20": ["ticker", "datetime", "rsi_20"],
+        "sma_200": ["ticker", "datetime", "sma_200"],
+        "sma_40": ["ticker", "datetime", "sma_40"],
+        "sma_20": ["ticker", "datetime", "sma_20"]
+    },
+    "economic_columns": {
+        "cpi": "cpi",
+        "nonfarm_payroll": "nonfarm",
+        "unemployment": "unemployment"
+    },
+    "combine_configuration": [
+        {"ticker": ["ticker", "datetime"]},
+        {"macd": ["ticker", "datetime"]},
+        {"rsi": ["ticker", "datetime", "period"]},
+        {"rsi_20": ["datetime"]},
+        {"rsi_40": ["datetime"]},
+        {"rsi_200": ["datetime"]},
+        {"sma": ["ticker", "datetime", "period"]},
+        {"sma_20": ["datetime"]},
+        {"sma_40": ["datetime"]},
+        {"sma_200": ["datetime"]},
+        {"news": ["title", "time_published", "ticker", "affected_topic"]},
+        {"merged_tec_info": ["ticker", "datetime"]}
+    ]
+}
