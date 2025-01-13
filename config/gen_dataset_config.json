@@ -1,0 +1,12 @@
+{
+    "features": {
+        "fill_missing_hours": true,
+        "calculate_avg_relevant_score": true,
+        "normalize_technical_indicators": false,
+        "merge_economic_data": true
+    },
+    "parameters": {
+        "time_fill_freq": "H",
+        "economic_merge_type": "left"
+    }
+}

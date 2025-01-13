@@ -1,8 +1,9 @@
-from datetime import datetime, timedelta
+import os
+import json
 import pandas as pd
 import matplotlib.pyplot as plt
-import json
-import os
+from datetime import datetime, timedelta
+
 
 def generate_month_list(start_year, end_year=None, frequency='monthly'):
     '''
@@ -31,10 +32,12 @@ def generate_month_list(start_year, end_year=None, frequency='monthly'):
 
     return month_list
 
+
 def generate_current_month():
     current_year = datetime.now().year
     current_month = datetime.now().month
     return f'{current_year}-{current_month}'
+
 
 def plot_data(df_combined, plot_type, y_column='close', title='Daily Closing Prices', ylabel='Closing Price'):
     '''

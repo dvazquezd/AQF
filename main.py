@@ -1,43 +1,32 @@
 import os
 import sys
-import pandas as pd
-import lib.BricMortar as bm
-import lib.DataLoader as dl
-from lib.ApiClient import ApiClient
-
+import loader.loader as loader
+import gen_dataset.gen_dataset as gen
+#import dataset_generator.generator as dataset_gen
+#import models.scripts.train as model_train
 
 def main():
-    '''    
-    '''
-    #Objects
-    client = ApiClient()
-    config = dl.load_config()
+    # 1. Cargar y procesar datos iniciales
+    dataframes = loader.run_loader()
 
-    # Variables y configuraciones
-    historical_needed = config['historical_needed']
-    symbols = config['symbols']
-    periods = config['periods']
-    economic_indicators = config['economic_indicators']
-    topics = config['topics']
-    dataframes = {key: pd.DataFrame() for key in config['dataframes']}
-    h_dataframes = dataframes
-    f_dataframes = dataframes    
-    tec_columns = config['tec_columns']
-    economic_columns = config['economic_columns']
-    combine_configuration = config['combine_configuration']
+    for key in dataframes.keys():
+        print(f'Dataframe: {key}\n')
+        print(dataframes[key].describe())
+        print(dataframes[key].info())
+        print(dataframes[key].head())
 
-    months = bm.get_months(2022, historical_needed)
-    dataframes = dl.load_data(dataframes,client, symbols, months, periods)
-    dataframes = dl.load_economics(dataframes, client, economic_indicators)
-    dataframes = dl.load_news(dataframes, client, months, topics)
-    dataframes = dl.merge_datasets(dataframes, periods, tec_columns, economic_columns)
 
-    if not historical_needed:
-        h_dataframes = dl.retrieve_data(h_dataframes)
-        f_dataframes = dl.combine_dataframes(dataframes, h_dataframes,f_dataframes, combine_configuration)   
 
-    dl.save_dataframes(f_dataframes)
+    #config = gen.run_gen_dataset()
 
-if __name__ == '__main__':
+    #print(config['features'])
+
+    # 2. Generar dataset final
+    #dataset = dataset_gen.generate_dataset(dataframes)
+
+    # 3. Entrenar y evaluar modelo
+    #model = model_train.train_and_evaluate(dataset)
+
+if __name__ == "__main__":
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
     main()

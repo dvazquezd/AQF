@@ -112,7 +112,7 @@ def transform_news_data(data, topic):
         
         
         # Convertir time_published al formato deseado
-        time_published = datetime.strptime(item['time_published'][:8] + ' ' + item['time_published'][9:11], '%Y%m%d %H').strftime('%Y-%m-%d %H:00:00')
+        timepublished =  pd.to_datetime(datetime.strptime(item['time_published'][:8] + ' ' + item['time_published'][9:11], '%Y%m%d %H').strftime('%Y-%m-%d %H:00:00'))
         
         overall_sentiment_score = item['overall_sentiment_score']
         overall_sentiment_label = item['overall_sentiment_label']
@@ -130,7 +130,7 @@ def transform_news_data(data, topic):
                 
                 # Agregar la fila con toda la información, incluyendo las nuevas columnas de topics
                 records.append([
-                    title, time_published, overall_sentiment_score, 
+                    title, timepublished, overall_sentiment_score, 
                     overall_sentiment_label, ticker, relevance_score, 
                     ticker_sentiment_score, ticker_sentiment_label, 
                     affected_topic, affected_topic_relevance_score, topic
@@ -138,10 +138,12 @@ def transform_news_data(data, topic):
     
     # Crear el DataFrame final con las columnas especificadas
     df_transformed = pd.DataFrame(records, columns=[
-        'title', 'time_published', 'overall_sentiment_score', 
+        'title', 'timepublished', 'overall_sentiment_score', 
         'overall_sentiment_label', 'ticker', 'relevance_score', 
         'ticker_sentiment_score', 'ticker_sentiment_label', 
         'affected_topic', 'affected_topic_relevance_score', 'topic'
     ])
-    
+
+    df_transformed.rename(columns={'timepublished': 'datetime'}, inplace=True)
+
     return df_transformed

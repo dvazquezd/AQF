@@ -1,8 +1,8 @@
 import os
 import json
 import pandas as pd
-from . import DataTransformer as transf
-from . import BricMortar as bm
+import loader.DataTransformer as transf
+import loader.BricMortar as bm
 
 
 def combine_dataframes(df_historical,df_current,f_dataframes, combine_configuration):
@@ -15,12 +15,9 @@ def combine_dataframes(df_historical,df_current,f_dataframes, combine_configurat
        f_dataframes[enconomic] = df_current[enconomic]
        all_keys.remove(enconomic)
        
-   for key in all_keys:        
+   for key in all_keys:
         df_combined = pd.concat([df_historical[key], df_current[key]]).drop_duplicates(subset=combine_configuration[key], keep='last')
-        if key == 'news':
-            f_dataframes[key] = df_combined.sort_values(by='time_published', ascending=True)   
-        else:
-            f_dataframes[key] = df_combined.sort_values(by='datetime', ascending=True)   
+        f_dataframes[key] = df_combined.sort_values(by='datetime', ascending=True)   
 
    return f_dataframes
 
@@ -50,7 +47,7 @@ def load_data(dfs,client, symbols, months, periods):
                 dfs['macd'] = combine_data( dfs['macd'], h_macd, subset_columns=['ticker','datetime'])
             
             for period in periods:
-                json_data_sma = client.get_sma(symbol, month,period)
+                json_data_sma = client.get_sma(symbol, month, period)
                 if json_data_sma:
                     h_sma = transf.transform_sma(symbol,json_data_sma,period)
                     dfs['sma'] = combine_data(dfs['sma'], h_sma, subset_columns=['ticker','datetime','period'])
@@ -88,7 +85,7 @@ def load_news(dfs,client, months, topics):
             json_data = client.get_news_sentiment(topic,time_from, time_to)
             if json_data is not None:
                 h_news = transf.transform_news_data(json_data, topic)
-                dfs['news'] = combine_data(dfs['news'], h_news, subset_columns=['title','time_published','ticker','affected_topic'])
+                dfs['news'] = combine_data(dfs['news'], h_news, subset_columns=['title','datetime','ticker','affected_topic'])
     
     return dfs
     
@@ -128,9 +125,15 @@ def merge_datasets(dfs, periods, tec_columns, economic_columns):
 
 def retrieve_data(dfs):
     '''
+    Recupera los datasets históricos desde archivos CSV y asegura que las columnas de fechas sean del tipo correcto.
     '''
-    for df in dfs.keys():
-        dfs[df] = bm.read_csv(f'data/df_{df}.csv')
+    for key in dfs.keys():
+        dfs[key] = bm.read_csv(f'data/df_{key}.csv')
+
+        # Identificar columnas relacionadas con fechas y convertirlas a datetime
+        for col in ['datetime', 'date', 'year_month']:
+            if col in dfs[key].columns:
+                dfs[key][col] = pd.to_datetime(dfs[key][col], errors='coerce')
 
     return dfs
 
@@ -141,14 +144,3 @@ def save_dataframes(dfs):
     all_keys = dfs.keys()
     for df in all_keys:
         bm.write_csv(dfs[df],f'data/df_{df}.csv')
-
-
-def load_config():
-    '''
-    '''
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Carpeta raíz (AQF)
-    CONFIG_PATH = os.path.join(BASE_DIR, 'config', 'config.json')
-    with open(CONFIG_PATH, 'r') as config_file:
-        config = json.load(config_file)
-
-    return config

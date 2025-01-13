@@ -46,7 +46,7 @@
         "sma_20": ["datetime"],
         "sma_40": ["datetime"],
         "sma_200": ["datetime"],
-        "news": ["title", "time_published", "ticker", "affected_topic"],
+        "news": ["title", "datetime", "ticker", "affected_topic"],
         "merged_tec_info": ["ticker", "datetime"]
     }
 }
