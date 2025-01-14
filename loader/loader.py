@@ -19,7 +19,7 @@ def run_loader():
     h_dataframes = dataframes.copy()
     f_dataframes = dataframes.copy()
 
-    months = bm.get_months(2022, config['historical_needed'])
+    months = bm.get_months(config['historical_year'], config['historical_needed'])
     dataframes = dl.load_data(dataframes,client, config['symbols'], months, config['periods'])
     dataframes = dl.load_economics(dataframes, client, config['economic_indicators'])
     dataframes = dl.load_news(dataframes, client, months, config['topics'])

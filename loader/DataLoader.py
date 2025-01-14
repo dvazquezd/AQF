@@ -46,12 +46,13 @@ def load_data(dfs,client, symbols, months, periods):
                 h_macd = transf.transform_macd(symbol,json_data_macd)
                 dfs['macd'] = combine_data( dfs['macd'], h_macd, subset_columns=['ticker','datetime'])
             
-            for period in periods:
+            for period in periods['sma']:
                 json_data_sma = client.get_sma(symbol, month, period)
                 if json_data_sma:
                     h_sma = transf.transform_sma(symbol,json_data_sma,period)
                     dfs['sma'] = combine_data(dfs['sma'], h_sma, subset_columns=['ticker','datetime','period'])
 
+            for period in periods['rsi']:
                 json_data_rsi = client.get_rsi(symbol, month, period)
                 if json_data_rsi:
                     h_rsi = transf.transform_rsi(symbol,json_data_rsi,period)
@@ -103,9 +104,9 @@ def merge_datasets(dfs, periods, tec_columns, economic_columns):
     Prepara el dataset final combinando datos de cotización con indicadores técnicos y económicos.
     '''
     # Paso 1: Transformar RSI y SMA
-    for period in periods:
-        for tech_indicator in ['rsi','sma']:
-            dfs[f'{tech_indicator}_{period}'] = transform_indicators(dfs, period, tech_indicator)
+    for key in periods.keys():
+        for period in periods[key]:
+            dfs[f'{key}_{period}'] = transform_indicators(dfs, period, key)
 
     # Paso 2: Unir los datasets de indicadores técnicos al dataset de cotización
     dfs['merged_tec_info'] = dfs['ticker']
