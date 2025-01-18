@@ -1,5 +1,6 @@
 import os
 import sys
+import pandas as pd
 import loader.loader as loader
 import gen_dataset.gen_dataset as gen
 #import dataset_generator.generator as dataset_gen
@@ -9,17 +10,11 @@ def main():
     # 1. Cargar y procesar datos iniciales
     dataframes = loader.run_loader()
 
-    for key in dataframes.keys():
-        print(f'Dataframe: {key}\n')
-        print(dataframes[key].describe())
-        print(dataframes[key].info())
-        print(dataframes[key].head())
+    tec_info = gen.run_gen_dataset(dataframes)
+
+    tec_info.to_csv('tec_info.csv',index=False)
 
 
-
-    #config = gen.run_gen_dataset()
-
-    #print(config['features'])
 
     # 2. Generar dataset final
     #dataset = dataset_gen.generate_dataset(dataframes)
