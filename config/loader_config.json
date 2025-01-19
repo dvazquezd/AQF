@@ -1,0 +1,56 @@
+{
+    "historical_needed": false,
+    "historical_year": 2022,
+    "symbols": ["NVDA"],
+    "periods": {
+        "sma": [5, 10, 12],
+        "rsi": [5, 7, 9]
+    },
+    "economic_indicators": ["unemployment", "nonfarm_payroll", "cpi"],
+    "topics": ["technology", "blockchain", "financial_markets", "economy_macro", "economy_monetary", "economy_fiscal"],
+    "dataframes": {
+        "ticker": {},
+        "macd": {},
+        "rsi": {},
+        "rsi_5": {},
+        "rsi_7": {},
+        "rsi_9": {},
+        "sma": {},
+        "sma_5": {},
+        "sma_10": {},
+        "sma_12": {},
+        "unemployment": {},
+        "cpi": {},
+        "nonfarm_payroll": {},
+        "news": {},
+        "merged_tec_info": {}
+    },
+    "tec_columns": {
+        "macd": ["ticker", "datetime", "MACD", "MACD_Signal", "MACD_Hist"],
+        "rsi_5": ["ticker", "datetime", "rsi_5"],
+        "rsi_7": ["ticker", "datetime", "rsi_7"],
+        "rsi_9": ["ticker", "datetime", "rsi_9"],
+        "sma_5": ["ticker", "datetime", "sma_5"],
+        "sma_10": ["ticker", "datetime", "sma_10"],
+        "sma_12": ["ticker", "datetime", "sma_12"]
+    },
+    "economic_columns": {
+        "cpi": "cpi",
+        "nonfarm_payroll": "nonfarm",
+        "unemployment": "unemployment"
+    },
+    "combine_configuration": {
+        "ticker": ["ticker", "datetime"],
+        "macd": ["ticker", "datetime"],
+        "rsi": ["ticker", "datetime", "period"],
+        "rsi_5": ["datetime"],
+        "rsi_7": ["datetime"],
+        "rsi_9": ["datetime"],
+        "sma": ["ticker", "datetime", "period"],
+        "sma_5": ["datetime"],
+        "sma_10": ["datetime"],
+        "sma_12": ["datetime"],
+        "news": ["title", "datetime", "ticker", "affected_topic"],
+        "merged_tec_info": ["ticker", "datetime"]
+    }
+}
