@@ -1,12 +1,13 @@
 import pandas as pd
+import utils.utils as ut
+
 
 class CheckDataset:
-    def __init__(self, config):
+    def __init__(self):
         """
         Inicializa la clase con la configuración del dataset.
         """
-        self.config = config
-
+        self.config = ut.load_config('gen_dataset_config')
 
     def apply_corrections(self, df):
         """
@@ -22,7 +23,6 @@ class CheckDataset:
             df = self.mark_incomplete_days(df)
 
         return df
-
 
     def calculate_missing_indicators(self, df):
         """
@@ -40,7 +40,6 @@ class CheckDataset:
             df = self.calculate_macd_partial(df)
 
         return df
-    
 
     def apply_date_time_actions(self, df):
         """
@@ -60,22 +59,22 @@ class CheckDataset:
 
         return df
 
-
-    def forward_fill(self, df):
+    @staticmethod
+    def forward_fill(df):
         """
         Rellena los valores faltantes usando forward-fill.
         """
         return df.fillna(method="ffill")
 
-
-    def backward_fill(self, df):
+    @staticmethod
+    def backward_fill(df):
         """
         Rellena los valores faltantes usando backward-fill.
         """
         return df.fillna(method="bfill")
 
-
-    def moving_average(self, df):
+    @staticmethod
+    def moving_average(df):
         """
         Rellena los valores faltantes usando un promedio móvil.
         """
@@ -83,7 +82,6 @@ class CheckDataset:
             lambda col: col.fillna(col.rolling(window=5, min_periods=1).mean())
             if col.dtype in [float, int] else col
         )
-
 
     def mark_incomplete_days(self, df):
         """
@@ -93,8 +91,8 @@ class CheckDataset:
         df = self.remove_incomplete_records(df)
         return df
 
-
-    def calculate_sma_partial(self, df, period, column="close"):
+    @staticmethod
+    def calculate_sma_partial(df, period, column="close"):
         """
         Calcula el Simple Moving Average (SMA) solo para los valores nulos en el dataset.
         """
@@ -107,8 +105,8 @@ class CheckDataset:
         df[sma_column] = df[sma_column].round(4)
         return df
 
-
-    def calculate_rsi_partial(self, df, period, column="close"):
+    @staticmethod
+    def calculate_rsi_partial(df, period, column="close"):
         """
         Calcula el Relative Strength Index (RSI) solo para los valores nulos en el dataset.
         """
@@ -128,9 +126,9 @@ class CheckDataset:
         df.loc[df[rsi_column].isnull(), rsi_column] = rsi_series[df[rsi_column].isnull()]
         df[rsi_column] = df[rsi_column].round(4)
         return df
-    
 
-    def calculate_macd_partial(self, df, short_window=12, long_window=26, signal_window=9, column="close"):
+    @staticmethod
+    def calculate_macd_partial(df, short_window=12, long_window=26, signal_window=9, column="close"):
         """
         Calcula el Moving Average Convergence Divergence (MACD) solo para los valores nulos en el dataset.
         """
@@ -153,7 +151,8 @@ class CheckDataset:
         df.loc[df["MACD_Hist"].isnull(), "MACD_Hist"] = macd_hist_series[df["MACD_Hist"].isnull()].round(4)
         return df
 
-    def remove_incomplete_records(self, df):
+    @staticmethod
+    def remove_incomplete_records(df):
         """
         Elimina los registros marcados como incompletos y borra la columna 'is_incomplete'.
         """
@@ -162,15 +161,15 @@ class CheckDataset:
             df = df[~df["is_incomplete"]].reset_index(drop=True)
             removed = original_size - len(df)
             print(f"Registros eliminados: {removed}")
-            
+
             # Eliminar la columna 'is_incomplete'
             df = df.drop(columns=["is_incomplete"])
         else:
             print("La columna 'is_incomplete' no existe en el dataset. No se eliminaron registros ni columnas.")
         return df
-    
 
-    def split_date(self,df):
+    @staticmethod
+    def split_date(df):
         """
         Elimina campos innecesarios y añade nuevos campos derivados de datetime.
         """
@@ -191,9 +190,9 @@ class CheckDataset:
         df["time"] = df["datetime"].dt.hour
 
         return df
-    
 
-    def fill_missing_hours(self, df):
+    @staticmethod
+    def fill_missing_hours(df):
         """
         Completa las 24 horas del día en el dataset:
         - Rellena las horas desde las 00:00 hasta la primera hora registrada con los valores de la primera hora.
@@ -252,9 +251,9 @@ class CheckDataset:
         df = df.drop(columns=["hour"])
 
         return df
-    
 
-    def fill_missing_days(self, df):
+    @staticmethod
+    def fill_missing_days(df):
         """
         Completa los días faltantes en el dataset:
         - Añade días no presentes en el rango temporal.
@@ -293,7 +292,8 @@ class CheckDataset:
             last_day_data = previous_day_data[previous_day_data["datetime"] == previous_day_data["datetime"].max()]
             for hour in range(24):  # Generar las 24 horas para el día faltante
                 row = last_day_data.iloc[0].copy()
-                row["year"], row["month"], row["day"], row["time"] = missing_date.year, missing_date.month, missing_date.day, hour
+                row["year"], row["month"], row["day"], row[
+                    "time"] = missing_date.year, missing_date.month, missing_date.day, hour
                 filled_rows.append(row)
 
         # Agregar filas generadas al dataset original
@@ -305,9 +305,9 @@ class CheckDataset:
         df = df.sort_values(by=["datetime"]).reset_index(drop=True)
 
         return df
-    
 
-    def add_temporal_features(self, df):
+    @staticmethod
+    def add_temporal_features(df):
         """
         Añade características temporales al dataset:
         - day_of_week: Día de la semana (0-6).
@@ -318,7 +318,8 @@ class CheckDataset:
         """
         # Asegurarse de que la columna datetime existe
         if "datetime" not in df.columns:
-            raise ValueError("El dataset no contiene la columna 'datetime' necesaria para calcular las características temporales.")
+            raise ValueError(
+                "El dataset no contiene la columna 'datetime' necesaria para calcular las características temporales.")
 
         # Día de la semana
         df["day_of_week"] = df["datetime"].dt.dayofweek
@@ -336,8 +337,6 @@ class CheckDataset:
         df.loc[~df["time"].between(4, 20, inclusive="both"), ["is_premarket", "is_market", "is_postmarket"]] = 0
 
         return df
-
-    
 
     def apply_advanced_features(self, df):
         """
@@ -369,38 +368,38 @@ class CheckDataset:
             df = self.add_cumulative_change_in_volume(df)
 
         return df
-    
 
-    def add_intraday_volatility(self, df):
+    @staticmethod
+    def add_intraday_volatility(df):
         df["intraday_volatility"] = (df["high"] - df["low"]).round(4)
         return df
 
-
-    def add_volume_ratio(self, df):
+    @staticmethod
+    def add_volume_ratio(df):
         df["volume_ratio"] = (df["volume"] / df["volume"].rolling(window=5, min_periods=1).mean()).round(4)
         return df
 
-
-    def add_price_trend(self, df):
+    @staticmethod
+    def add_price_trend(df):
         df["price_trend"] = df["close"].pct_change().round(4)
         return df
 
-
-    def add_monthly_cycle(self, df):
+    @staticmethod
+    def add_monthly_cycle(df):
         df["month_cycle"] = df["day"]
         return df
 
-
-    def add_yearly_cycle(self, df):
+    @staticmethod
+    def add_yearly_cycle(df):
         df["yearly_cycle"] = df["datetime"].dt.quarter
         return df
 
-
-    def add_closing_moving_avg(self, df):
+    @staticmethod
+    def add_closing_moving_avg(df):
         df["closing_moving_avg"] = df["close"].rolling(window=5, min_periods=1).mean().round(4)
         return df
 
-
-    def add_cumulative_change_in_volume(self, df):
+    @staticmethod
+    def add_cumulative_change_in_volume(df):
         df["cumulative_change_in_volume"] = df["volume"].cumsum().round(4)
         return df

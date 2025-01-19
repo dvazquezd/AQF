@@ -1,15 +1,15 @@
-import os
 import json
-import pandas as pd
-import matplotlib.pyplot as plt
+import os
 from datetime import datetime, timedelta
+
+import pandas as pd
 
 
 def generate_month_list(start_year, end_year=None, frequency='monthly'):
-    '''
+    """
     Genera una lista de meses desde start_year hasta el año actual o el año especificado.
     frequency: 'monthly' (por defecto) o 'quarterly'
-    '''
+    """
     current_year = datetime.now().year
     current_month = datetime.now().month
 
@@ -39,35 +39,8 @@ def generate_current_month():
     return f'{current_year}-{current_month}'
 
 
-def plot_data(df_combined, plot_type, y_column='close', title='Daily Closing Prices', ylabel='Closing Price'):
-    '''
-    Función genérica para graficar datos. 
-    df_combined: DataFrame que contiene los datos a graficar.
-    plot_type: 'ticker' o 'macd' (diferentes tipos de gráficos).
-    y_column: Columna a graficar (por defecto 'close').
-    '''
-    df_combined['datetime'] = pd.to_datetime(df_combined['datetime'])
-    df_combined['date'] = df_combined['datetime'].dt.date
-
-    grouped_data = df_combined.groupby(['ticker', 'date']).agg({y_column: 'last'}).reset_index()
-
-    plt.figure(figsize=(20, 10))
-    for symbol in grouped_data['ticker'].unique():
-        symbol_data = grouped_data[grouped_data['ticker'] == symbol]
-        plt.plot(symbol_data['date'], symbol_data[y_column], label=symbol)
-
-    plt.title(title)
-    plt.xlabel('Date')
-    plt.ylabel(ylabel)
-    plt.legend(title='Symbols')
-    plt.xticks(rotation=45)
-    plt.grid(True)
-    plt.tight_layout()
-    plt.show()
-
-
 def save_json(data, file_name, indent_num=4):
-    '''Guarda los datos en formato JSON.'''
+    """Guarda los datos en formato JSON."""
     with open(file_name, 'w') as hist_file:
         json.dump(data, hist_file, indent=indent_num)
 

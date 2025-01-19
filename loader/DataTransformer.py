@@ -1,9 +1,9 @@
 import pandas as pd
 from datetime import datetime
 
-def manage_dates(df, type):
+def manage_dates(df, date_type):
 
-    if type is None:
+    if date_type is None:
         df['datetime'] = pd.to_datetime(df['datetime'], format='%Y-%m-%d %H:%M')
         df['date'] = pd.to_datetime(df['datetime']).dt.date
         df['year_month'] = pd.to_datetime(df['datetime']).dt.to_period('M').astype(str)

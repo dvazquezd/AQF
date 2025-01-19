@@ -1,38 +1,38 @@
-import os
-import json
 import pandas as pd
-import loader.DataTransformer as transf
+
 import loader.BricMortar as bm
+import loader.DataTransformer as transf
 
 
-def combine_dataframes(df_historical,df_current,f_dataframes, combine_configuration):
-   '''
-   Combine same datasets types deleting duplicates
-   '''
-   all_keys = list(df_current.keys())
+def combine_dataframes(df_historical, df_current, f_dataframes, combine_configuration):
+    """
+    Combine same datasets types deleting duplicates
+    """
+    all_keys = list(df_current.keys())
 
-   for enconomic in ['unemployment','nonfarm_payroll','cpi']:
+    for enconomic in ['unemployment','nonfarm_payroll','cpi']:
        f_dataframes[enconomic] = df_current[enconomic]
        all_keys.remove(enconomic)
-       
-   for key in all_keys:
-        df_combined = pd.concat([df_historical[key], df_current[key]]).drop_duplicates(subset=combine_configuration[key], keep='last')
-        f_dataframes[key] = df_combined.sort_values(by='datetime', ascending=True)   
 
-   return f_dataframes
+    for key in all_keys:
+       df_combined = pd.concat([df_historical[key], df_current[key]]).drop_duplicates(subset=combine_configuration[key], keep='last')
+       f_dataframes[key] = df_combined.sort_values(by='datetime', ascending=True)
+
+    return f_dataframes
 
 
 def combine_data(df_historical,df_current,subset_columns):
-   '''
-    Combine same datasets types deleting duplicates
-   '''
-   df_combined = pd.concat([df_historical, df_current]).drop_duplicates(subset=subset_columns, keep='last')
-   return df_combined
+    """
+     Combine same datasets types deleting duplicates
+    """
+    df_combined = pd.concat([df_historical, df_current]).drop_duplicates(subset=subset_columns, keep='last')
+    return df_combined
 
 
 def load_data(dfs,client, symbols, months, periods):
-    '''
-    '''
+    """
+
+    """
     for symbol in symbols:
         for month in months:
             # Obtener y transformar datos de ticker
@@ -62,8 +62,8 @@ def load_data(dfs,client, symbols, months, periods):
 
 
 def load_economics(dfs, client, indicators):
-    '''
-    '''
+    """
+    """
     for indicator in indicators:
         print(f'Getting data: {{\'function\': {indicator}}}')
         json_data = client.get_economic_indicator(indicator)
@@ -78,8 +78,8 @@ def load_economics(dfs, client, indicators):
 
 
 def load_news(dfs,client, months, topics):
-    '''
-    '''
+    """
+    """
     for month in months:
         for topic in topics:
             time_from, time_to = bm.get_time_range(month)
@@ -92,17 +92,17 @@ def load_news(dfs,client, months, topics):
     
 
 def transform_indicators(dfs, period, tech_indicator):
-    '''
-    '''
+    """
+    """
     df_transformed =  dfs[tech_indicator][dfs[tech_indicator]['period'] == period][['ticker', 'datetime', tech_indicator]].copy()
     df_transformed.rename(columns={tech_indicator: f'{tech_indicator}_{period}'},inplace = True)
     return df_transformed
 
 
 def merge_datasets(dfs, periods, tec_columns, economic_columns):
-    '''
+    """
     Prepara el dataset final combinando datos de cotización con indicadores técnicos y económicos.
-    '''
+    """
     # Paso 1: Transformar RSI y SMA
     for key in periods.keys():
         for period in periods[key]:
@@ -125,9 +125,9 @@ def merge_datasets(dfs, periods, tec_columns, economic_columns):
 
 
 def retrieve_data(dfs):
-    '''
+    """
     Recupera los datasets históricos desde archivos CSV y asegura que las columnas de fechas sean del tipo correcto.
-    '''
+    """
     for key in dfs.keys():
         dfs[key] = bm.read_csv(f'data/df_{key}.csv')
 
@@ -140,8 +140,9 @@ def retrieve_data(dfs):
 
 
 def save_dataframes(dfs):
-    '''
-    '''
+    """
+
+    """
     all_keys = dfs.keys()
     for df in all_keys:
         bm.write_csv(dfs[df],f'data/df_{df}.csv')

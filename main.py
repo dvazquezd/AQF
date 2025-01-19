@@ -1,6 +1,5 @@
 import os
 import sys
-import pandas as pd
 import loader.loader as loader
 import gen_dataset.gen_dataset as gen
 #import dataset_generator.generator as dataset_gen
