@@ -18,9 +18,11 @@ def main():
     """
     dataframes = loader.run_loader()
 
-    tec_info = gen.run_gen_dataset(dataframes)
+    tec_info, news_info = gen.run_gen_dataset(dataframes)
 
     tec_info.to_csv('tec_info.csv',index=False)
+    news_info.to_csv('news_info.csv',index=False)
+
 
 
 

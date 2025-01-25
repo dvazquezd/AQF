@@ -1,33 +1,63 @@
 import os
 import sys
+from gen_dataset.CheckNewsDataset import CheckNewsDataset
 from gen_dataset.CheckTecDataset import CheckTecDataset
 
 
-def check_tec_dataset(df, checker):
+def check_news_dataset(df, checker, target_ticker):
     """
-    Performs a series of operations to correct and enhance the provided dataset
-    using the specified checker. This includes calculating missing indicators,
-    applying date-time adjustments, performing corrections, and adding advanced
-    features.
+    Checks and processes a news dataset for a specific target ticker.
+
+    This function filters the given dataset for a specified target ticker using the
+    provided checker object. After filtering, it generates relevant features for
+    the data entries associated with the target ticker.
 
     Parameters:
-    df : DataFrame
-        The input dataset that needs to be corrected and enhanced.
-    checker : object
-        An object containing methods for handling various correction and
-        enhancement operations.
+    df: DataFrame
+        The input dataset containing news data.
+
+    checker: Any
+        An object that provides methods for filtering the dataset by a ticker
+        and generating features.
+
+    target_ticker: str
+        The ticker symbol used to filter the news dataset.
 
     Returns:
     DataFrame
-        The corrected and enhanced dataset after all transformations.
+        A filtered and processed dataset containing news entries for the
+        target ticker with additional generated features.
+    """
+    df_news = checker.filter_by_ticker(df, target_ticker)
+
+    return df_news
+
+def check_tec_dataset(df, checker):
+    """
+        Performs a series of operations to correct and enhance the provided dataset
+        using the specified checker. This includes calculating missing indicators,
+        applying date-time adjustments, performing corrections, and adding advanced
+        features.
+
+        Parameters:
+        df : DataFrame
+            The input dataset that needs to be corrected and enhanced.
+        checker : object
+            An object containing methods for handling various correction and
+            enhancement operations.
+
+        Returns:
+        DataFrame
+            The corrected and enhanced dataset after all transformations.
     """
     # Corregir valores faltantes en el dataset merged_tec_info
     df_tec = checker.calculate_missing_indicators(df)
     df_tec = checker.apply_date_time_actions(df_tec)
     df_tec = checker.apply_corrections(df_tec)
     df_tec = checker.apply_advanced_features(df_tec)
+    target_ticker = checker.get_target_ticker(df_tec)
 
-    return df_tec
+    return df_tec, target_ticker
 
 
 def run_gen_dataset(dfs):
@@ -47,7 +77,10 @@ def run_gen_dataset(dfs):
     """
     # Inicializar el módulo de corrección
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-    checker = CheckTecDataset()
-    df_tec = check_tec_dataset(dfs['tec_info'],checker)
+    tec_checker = CheckTecDataset()
+    news_checker = CheckNewsDataset()
 
-    return df_tec
+    df_tec, target_ticker = check_tec_dataset(dfs['tec_info'],tec_checker)
+    df_news = check_news_dataset(dfs['news'],news_checker, target_ticker)
+
+    return df_tec, df_news

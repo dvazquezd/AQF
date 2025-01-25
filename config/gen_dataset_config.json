@@ -28,5 +28,12 @@
     "aggregated_perspective":{
         "closing_moving_avg": true,
         "cumulative_change_in_volume": true
+    },
+    "news_features": {
+        "avg_sentiment_score": true,
+        "sentiment_proportions": true,
+        "avg_relevance_score": true,
+        "news_count": true,
+        "sentiment_change": true
     }
 }
