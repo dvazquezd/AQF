@@ -1,39 +1,39 @@
 {
-    "correction_methods": {
+    "tec_correction_methods": {
         "forward_fill": false,
         "backward_fill": false,
         "moving_average": false,
         "mark_incomplete_days": true
     },
-    "calculate_indicators": {
+    "tec_calculate_indicators": {
         "sma": true,
         "rsi": true,
         "macd": true
     },
-    "date_time_actions": {
-        "date_split": true,
-        "fill_missing_days": true,
-        "fill_missing_hours": true,
-        "add_temporal_features": true
-    },
-    "advanced_indicators":{
+    "tec_advanced_indicators":{
         "intraday_volatility": true,
         "volume_ratio": true,
         "price_trend": true
     },
-    "cycle_analysis":{
+    "tec_cycle_analysis":{
         "monthly_cycle": true,
         "yearly_cycle": true
     },
-    "aggregated_perspective":{
+    "tec_aggregated_perspective":{
         "closing_moving_avg": true,
         "cumulative_change_in_volume": true
     },
-    "news_features": {
+    "news_ticker_features": {
         "avg_sentiment_score": true,
         "sentiment_proportions": true,
         "avg_relevance_score": true,
         "news_count": true,
         "sentiment_change": true
+    },
+    "global_date_time_actions": {
+        "date_split": true,
+        "fill_missing_days": true,
+        "fill_missing_hours": true,
+        "add_temporal_features": true
     }
 }

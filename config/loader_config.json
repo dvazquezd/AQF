@@ -1,5 +1,5 @@
 {
-    "historical_needed": false,
+    "historical_needed": true,
     "historical_year": 2022,
     "symbols": ["NVDA"],
     "periods": {
