@@ -1,53 +1,37 @@
 import os
 import sys
+from gen_dataset.CheckNewsDataset import CheckNewsDataset
 from gen_dataset.CheckTecDataset import CheckTecDataset
 
 
-def check_tec_dataset(df, checker):
+def check_news_dataset(checker):
     """
-    Performs a series of operations to correct and enhance the provided dataset
-    using the specified checker. This includes calculating missing indicators,
-    applying date-time adjustments, performing corrections, and adding advanced
-    features.
+    """
+    checker.generate_ticker_features()
 
-    Parameters:
-    df : DataFrame
-        The input dataset that needs to be corrected and enhanced.
-    checker : object
-        An object containing methods for handling various correction and
-        enhancement operations.
+    return checker
 
-    Returns:
-    DataFrame
-        The corrected and enhanced dataset after all transformations.
+def check_tec_dataset(checker):
+    """
     """
     # Corregir valores faltantes en el dataset merged_tec_info
-    df_tec = checker.calculate_missing_indicators(df)
-    df_tec = checker.apply_date_time_actions(df_tec)
-    df_tec = checker.apply_corrections(df_tec)
-    df_tec = checker.apply_advanced_features(df_tec)
+    checker.calculate_missing_indicators()
+    checker.apply_date_time_actions()
+    checker.apply_corrections()
+    checker.apply_advanced_features()
+    checker.get_target_ticker()
 
-    return df_tec
+    return checker
 
 
 def run_gen_dataset(dfs):
     """
-        Processes and validates a dataset by initializing a correction module and
-        invoking a dataset checker on a specific key of the provided data.
-
-        Parameters:
-        dfs: dict
-            A dictionary containing datasets, including a key 'tec_info'
-            associated with relevant data for technical validation.
-
-        Returns:
-        pandas.DataFrame
-            A DataFrame containing the validated and possibly corrected
-            version of the 'tec_info' dataset.
     """
-    # Inicializar el módulo de corrección
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-    checker = CheckTecDataset()
-    df_tec = check_tec_dataset(dfs['tec_info'],checker)
+    tec_checker = CheckTecDataset(dfs['tec_info'])
+    news_checker = CheckNewsDataset(dfs['news'],tec_checker.target_ticker)
 
-    return df_tec
+    tec_checker = check_tec_dataset(tec_checker)
+    news_checker = check_news_dataset(news_checker)
+
+    return tec_checker.df , news_checker.df
