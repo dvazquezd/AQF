@@ -68,6 +68,8 @@ class CheckNewsDataset:
                 df = self._calculate_topic_metrics(topic)
                 self.df = self.intermediate_dataset(df)
 
+        self.df = self.df.fillna(0)
+
     def intermediate_dataset(self,df):
         if self.df is None:
             return df
