@@ -1,5 +1,5 @@
 {
-    "historical_needed": true,
+    "historical_needed": false,
     "historical_year": 2022,
     "symbols": ["NVDA"],
     "periods": {
@@ -7,7 +7,7 @@
         "rsi": [5, 7, 9]
     },
     "economic_indicators": ["unemployment", "nonfarm_payroll", "cpi"],
-    "topics": ["technology", "blockchain", "financial_markets", "economy_macro", "economy_monetary", "economy_fiscal"],
+    "topics": ["technology", "financial_markets", "economy_macro", "economy_monetary", "economy_fiscal"],
     "dataframes": {
         "ticker": {},
         "macd": {},

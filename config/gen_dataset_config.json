@@ -16,8 +16,8 @@
         "price_trend": true
     },
     "tec_cycle_analysis":{
-        "monthly_cycle": true,
-        "yearly_cycle": true
+        "monthly_cycle": false,
+        "yearly_cycle": false
     },
     "tec_aggregated_perspective":{
         "closing_moving_avg": true,
@@ -29,6 +29,13 @@
         "avg_relevance_score": true,
         "news_count": true,
         "sentiment_change": true
+    },
+    "topic_features": {
+        "technology": true,
+        "financial_markets": true,
+        "economy_macro": true,
+        "economy_monetary": true,
+        "economy_fiscal": true
     },
     "global_date_time_actions": {
         "date_split": true,

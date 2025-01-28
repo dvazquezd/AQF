@@ -8,6 +8,7 @@ def check_news_dataset(checker):
     """
     """
     checker.generate_ticker_features()
+    checker.generate_topic_features()
 
     return checker
 
