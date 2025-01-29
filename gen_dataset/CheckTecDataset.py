@@ -24,6 +24,18 @@ class CheckTecDataset:
 
         return self.df
 
+    def apply_economic_indicators(self):
+        """
+        """
+        # Verificar que self.df es un DataFrame válido
+        if self.df is None or self.df.empty:
+            raise ValueError("El dataset técnico está vacío o no ha sido inicializado correctamente.")
+
+        # Obtener los indicadores económicos de la configuración
+        for indicator, enabled in self.config["tec_economic_indicators"].items():
+            if not enabled and indicator in self.df.columns:
+                self.df.drop(columns=[indicator], inplace=True)
+
     def calculate_missing_indicators(self):
         """
         """

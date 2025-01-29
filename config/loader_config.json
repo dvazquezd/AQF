@@ -36,7 +36,7 @@
     },
     "economic_columns": {
         "cpi": "cpi",
-        "nonfarm_payroll": "nonfarm",
+        "nonfarm_payroll": "nonfarm_payroll",
         "unemployment": "unemployment"
     },
     "combine_configuration": {

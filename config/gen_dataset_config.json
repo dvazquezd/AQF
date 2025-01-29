@@ -23,6 +23,11 @@
         "closing_moving_avg": true,
         "cumulative_change_in_volume": true
     },
+    "tec_economic_indicators":{
+        "cpi": false,
+        "nonfarm_payroll": false,
+        "unemployment": false
+    },
     "news_ticker_features": {
         "avg_sentiment_score": true,
         "sentiment_proportions": true,

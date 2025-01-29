@@ -4,3 +4,4 @@ lib/__pycache__/
 data/
 .venv
 *.csv
+.idea

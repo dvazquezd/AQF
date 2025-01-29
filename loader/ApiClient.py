@@ -1,45 +1,28 @@
 import requests
 import os
 import time
+from datetime import datetime
 
 class ApiClient:
 
     def __init__(self):
         """
-        AlphaVantageAPI class handles interaction with the Alpha Vantage financial
-        data API. This class provides a method of initializing and storing relevant
-        API credentials and other configurations.
-
-        Attributes:
-            apiKey (str): API key fetched from environment variable 'ALPHAVKEY'.
-                Used for authenticating API requests.
-            baseUrl (str): Base URL string for the Alpha Vantage API endpoint.
-            requests_made (list): A list keeping track of requests made to the
-                Alpha Vantage API.
         """
+
         self.apiKey = os.getenv('ALPHAVKEY')
         self.baseUrl = 'https://www.alphavantage.co/query'
         self.requests_made = []
 
     def _control_rate_limit(self):
         """
-        Controls the rate of requests made within a certain time frame to avoid exceeding the limit.
-        It ensures that a maximum of 75 requests are made in any rolling 60-second window. If the
-        limit is reached, it calculates the necessary wait time and pauses execution before allowing
-        further requests.
-
-        Attributes:
-            requests_made (list[float]): Stores the timestamp of requests made in the last 60 seconds.
-
-        Raises:
-            None
         """
         current_time = time.time()
         self.requests_made = [t for t in self.requests_made if current_time - t < 60]  # Mantiene solo las solicitudes del último minuto
         
         if len(self.requests_made) >= 75:  # Si hemos hecho 75 peticiones en el último minuto
+            time_stamp = datetime.now()
             sleep_time = 60 - (current_time - self.requests_made[0])  # Calcular el tiempo que falta para completar el minuto
-            print(f"Límite de 75 peticiones por minuto alcanzado. Tiempo de espera {sleep_time:.2f} segundos.")
+            print(f"{time_stamp.strftime("%Y-%m-%d %H:%M:%S")} :: Límite de 75 peticiones por minuto alcanzado. Tiempo de espera {sleep_time:.2f} segundos.")
             time.sleep(sleep_time)  # Pausar hasta que podamos hacer más peticiones
 
         self.requests_made.append(current_time)  # Añadir el timestamp de la nueva petición
@@ -70,11 +53,13 @@ class ApiClient:
             response.raise_for_status()
             data = response.json()
             if not data or "Error" in data:
-                print(f"Error in API response: {data}")
+                time_stamp = datetime.now()
+                print(f"{time_stamp.strftime("%Y-%m-%d %H:%M:%S")} :: Error in API response: {data}")
                 return None
             return data
         except requests.exceptions.RequestException as e:
-            print(f"Request failed: {e}")
+            time_stamp = datetime.now()
+            print(f"{time_stamp.strftime("%Y-%m-%d %H:%M:%S")} :: Request failed: {e}")
             return None
 
     def get_data(self, function, symbol, **kwargs):
@@ -107,7 +92,8 @@ class ApiClient:
             }
         
         params.update(kwargs)
-        print(f'Getting data: {params} ')
+        time_stamp = datetime.now()
+        print(f'{time_stamp.strftime("%Y-%m-%d %H:%M:%S")} - Getting data: {params} ')
         data = self._get(params)
 
         # Definir la clave correspondiente según el tipo de función solicitada
@@ -122,7 +108,8 @@ class ApiClient:
         if data and analysis_key in data:
             return data[analysis_key]
         else:
-            print('Error o datos no encontrados en la respuesta')
+            time_stamp = datetime.now()
+            print(f'{time_stamp.strftime("%Y-%m-%d %H:%M:%S")} :: Error o datos no encontrados en la respuesta')
             return None
  
     def get_economic_indicator(self, function):
