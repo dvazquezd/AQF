@@ -6,20 +6,13 @@ import gen_dataset.GenDataset as GenDataset
 
 def main():
     """
-    main()
-
-    This function orchestrates the overall workflow by loading data, generating dataset
-    from the processed data, and exporting the final dataset to a CSV file. Each step is
-    performed sequentially to ensure proper data handling and processing for further use.
-
-    Returns:
-        None: This function does not return any data.
     """
     dataframes = loader.run_loader()
-    tec_info, news_info = GenDataset.run_gen_dataset(dataframes)
+    tec_info, news_info, mid = GenDataset.run_gen_dataset(dataframes)
 
     tec_info.to_csv('tec_info.csv',index=False)
     news_info.to_csv('news_info.csv',index=False)
+    mid.to_csv('mid.csv',index=False)
 
     # 2. Generar dataset final
     #dataset = dataset_gen.generate_dataset(dataframes)
