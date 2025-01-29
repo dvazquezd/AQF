@@ -35,12 +35,15 @@
         "news_count": true,
         "sentiment_change": true
     },
-    "topic_features": {
+    "news_topic_features": {
         "technology": true,
         "financial_markets": true,
         "economy_macro": true,
         "economy_monetary": true,
         "economy_fiscal": true
+    },
+    "news_aggregate_hours": {
+        "aggregate_news_horus": 3
     },
     "global_date_time_actions": {
         "date_split": true,
