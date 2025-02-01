@@ -7,14 +7,33 @@ class ApiClient:
 
     def __init__(self):
         """
-        """
+        Class representing a client to interact with the Alpha Vantage API. This class initializes
+        with an API key fetched from environment variables and sets up the base URL for API requests.
+        It also keeps track of the requests made during the session.
 
+        Attributes:
+            apiKey (str): The API key for authenticating requests, fetched from the environment.
+            baseUrl (str): The base URL used for API queries.
+            requests_made (list): A list to track the requests made to the API.
+        """
         self.apiKey = os.getenv('ALPHAVKEY')
         self.baseUrl = 'https://www.alphavantage.co/query'
         self.requests_made = []
 
     def _control_rate_limit(self):
         """
+        Controls the rate limit for making requests in a system that limits to 75 requests per minute.
+
+        The method ensures that no more than 75 requests can be made in any given minute by monitoring
+        time data for past requests. If the limit is reached, it calculates the remaining wait time to
+        complete a minute since the earliest recorded request and pauses the process before allowing
+        further action.
+
+        Raises
+        ------
+        No explicit exceptions are raised by this function. However, system-related issues such as inability
+        to sleep due to threading or OS-level interruptions may lead to unintended behaviors.
+
         """
         current_time = time.time()
         self.requests_made = [t for t in self.requests_made if current_time - t < 60]  # Mantiene solo las solicitudes del último minuto
@@ -93,7 +112,7 @@ class ApiClient:
         
         params.update(kwargs)
         time_stamp = datetime.now()
-        print(f'{time_stamp.strftime("%Y-%m-%d %H:%M:%S")} - Getting data: {params} ')
+        print(f'{time_stamp.strftime("%Y-%m-%d %H:%M:%S")} :: Getting data: {params} ')
         data = self._get(params)
 
         # Definir la clave correspondiente según el tipo de función solicitada

@@ -63,7 +63,7 @@ def write_csv(df, file_path):
     directory = os.path.dirname(file_path)
     if not os.path.exists(directory):
         os.makedirs(directory)  # Crear el directorio si no existe
-    df.to_csv(file_path, index=False)
+    df.to_csv(file_path, encoding='utf-8', index=False)
 
 
 def dataframes_creator(names):
@@ -100,3 +100,6 @@ def get_months(year, historical_needed):
         months = [generate_current_month()]
 
     return months
+
+def get_time_now():
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")

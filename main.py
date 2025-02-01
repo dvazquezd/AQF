@@ -2,20 +2,20 @@ import os
 import sys
 import loader.loader as loader
 import gen_dataset.GenDataset as GenDataset
+from utils.ConfigLogger import ConfigLogger
 #import models.scripts.train as model_train
 
 def main():
     """
     """
+    # Guardar la configuración de esta ejecución en 'data/config_history.csv'
+    config_logger = ConfigLogger(output_dir='data')
+    config_logger.log_config()
+
     dataframes = loader.run_loader()
-    tec_info, news_info, mid = GenDataset.run_gen_dataset(dataframes)
+    df_aqf = GenDataset.run_gen_dataset(dataframes)
 
-    tec_info.to_csv('tec_info.csv',index=False)
-    news_info.to_csv('news_info.csv',index=False)
-    mid.to_csv('mid.csv',index=False)
-
-    # 2. Generar dataset final
-    #dataset = dataset_gen.generate_dataset(dataframes)
+    df_aqf.to_csv('data/df_aqf.csv',encoding='utf-8',index=False)
 
     # 3. Entrenar y evaluar modelo
     #model = model_train.train_and_evaluate(dataset)

@@ -165,21 +165,21 @@ class CheckTecDataset:
             original_size = len(self.df)
             self.df = self.df[~self.df["is_incomplete"]].reset_index(drop=True)
             removed = original_size - len(self.df)
-            print(f"Registros eliminados: {removed}")
+            print(f'{ut.get_time_now()} :: Dataset generation: Deleted rows: {removed}')
 
             # Eliminar la columna 'is_incomplete'
             self.df = self.df.drop(columns=["is_incomplete"])
 
             return self.df
         else:
-            print("La columna 'is_incomplete' no existe en el dataset. No se eliminaron registros ni columnas.")
+            print(f"{ut.get_time_now()} ::  Dataset generation: The 'is_incomplete' row does not exists in dataset. Rows have not been removed.")
 
     def split_date(self):
         """
         """
         # Verificar si datetime existe en el dataset
         if "datetime" not in self.df.columns:
-            raise ValueError("El dataset no contiene una columna 'datetime'.")
+            raise ValueError(f"{ut.get_time_now()} ::  Dataset generation: The dataset has not 'datetime' column. Cannot split date.")
 
         # Convertir datetime si no está en el formato adecuado
         self.df["datetime"] = pd.to_datetime(self.df["datetime"], errors="coerce")
