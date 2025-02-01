@@ -1,4 +1,5 @@
 import pandas as pd
+import utils.utils as ut
 
 
 class DatasetGenerator:
@@ -6,6 +7,7 @@ class DatasetGenerator:
         self.df_news = df_news.copy()
         self.df_tec = df_tec.copy()
         self.df = pd.DataFrame()
+        self.config = ut.load_config('gen_dataset_config')
 
     def complete_missing_times(self):
         """
@@ -24,29 +26,34 @@ class DatasetGenerator:
         # Rellenar valores faltantes con 0
         self.df.fillna(0, inplace=True)
 
-    def aggregate_previous_hours(self, hours=3):
+    def aggregate_previous_hours(self):
         """
-        Agrega las métricas de noticias de las últimas N horas de manera dinámica,
-        basándose en las columnas numéricas disponibles en df_news.
         """
-        # Identificar columnas numéricas excluyendo datetime
-        numeric_columns = self.df_news.select_dtypes(include=['number']).columns.tolist()
+        if self.config["news_aggregate_hours"].get("aggregate_news_execute", False):
+            hours = self.config["news_aggregate_hours"]["aggregate_news_horus"]
+            # Identificar columnas numéricas excluyendo datetime
+            numeric_columns = self.df.select_dtypes(include=['number']).columns.tolist()
 
-        if not numeric_columns:
-            print("No hay columnas numéricas para agregar.")
-            return self.df_news
+            # Asegurar que los datos están ordenados por 'datetime'
+            self.df = self.df.sort_values(by='datetime')
 
-        # Aplicar ventana deslizante para calcular la media en las últimas 'hours' horas
-        self.df_news.set_index('datetime', inplace=True)
-        self.df_news[numeric_columns] = self.df_news[numeric_columns].rolling(f'{hours}H', min_periods=1).mean()
-        self.df_news.reset_index(inplace=True)
+            if not numeric_columns:
+                print("No hay columnas numéricas para agregar.")
+                return self.df
+            # Aplicar ventana deslizante para calcular la media en las últimas 'hours' horas
+            self.df.set_index('datetime', inplace=True)
+            self.df[numeric_columns] = self.df[numeric_columns].rolling(f'{hours}h', min_periods=1).mean()
+            self.df.reset_index(inplace=True)
 
-        return self.df_news
+            return self.df
 
     def merge_datasets(self):
         """
-        Realiza el merge del dataset de noticias con el dataset técnico por datetime.
         """
-        self.df = pd.merge(self.df_tec, self.df_news, on='datetime', how='left')
+        self.df = pd.merge(self.df_tec, self.df, on='datetime', how='left')
+        if "close" in self.df.columns:  # Asegurar que la columna 'close' existe
+            self.df["target"] = (self.df["close"] > self.df["close"].shift(1)).astype(int)  # 1 si sube, 0 si baja
+            self.df["target_pct_change"] = (
+                        (self.df["close"] - self.df["close"].shift(1)) / self.df["close"].shift(1)).round(6)
 
         return self.df

@@ -53,7 +53,8 @@ class CheckNewsDataset:
             'Financial Markets': 'financial_markets',
             'Economy - Macro': 'economy_macro',
             'Economy - Monetary': 'economy_monetary',
-            'Economy - Fiscal': 'economy_fiscal'
+            'Economy - Fiscal': 'economy_fiscal',
+            'Finance': 'finance'
         })
 
         return self.original_df
@@ -63,7 +64,7 @@ class CheckNewsDataset:
         """
         self.original_df = self.normalize_topic_names()
 
-        for topic, enabled in self.config.get('topic_features', {}).items():
+        for topic, enabled in self.config.get('news_topic_features', {}).items():
             if enabled:
                 df = self._calculate_topic_metrics(topic)
                 self.df = self.intermediate_dataset(df)

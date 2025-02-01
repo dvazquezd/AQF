@@ -1,7 +1,8 @@
 import pandas as pd
-
 import utils.utils as ut
 import loader.DataTransformer as Transformer
+from datetime import datetime
+from utils.utils import get_time_now
 
 
 def combine_dataframes(df_historical, df_current, f_dataframes, combine_configuration):
@@ -50,25 +51,22 @@ def combine_dataframes(df_historical, df_current, f_dataframes, combine_configur
 
 def combine_data(df_historical,df_current,subset_columns):
     """
-    Combines and deduplicates historical and current data based on specified subset columns.
-
-    This function takes two dataframes, one containing historical data and the other containing
-    current data, combines them, and removes duplicates based on the specified subset of columns.
-    In case of duplicates, the most recent data (from `df_current`) is retained.
-
-    Parameters:
-    df_historical : pd.DataFrame
-        The dataframe containing historical data.
-    df_current : pd.DataFrame
-        The dataframe containing current data.
-    subset_columns : list
-        A list of column names to consider for identifying duplicates.
-
-    Returns:
-    pd.DataFrame
-        A combined dataframe with duplicates removed based on the subset columns.
     """
+    df_historical = df_historical.dropna(how='all') if not df_historical.empty else pd.DataFrame()
+    df_current = df_current.dropna(how='all') if not df_current.empty else pd.DataFrame()
+
+    if df_historical.empty and df_current.empty:
+        return pd.DataFrame()
+
+    if df_historical.empty and not df_current.empty:
+        return df_current
+
+    if not df_historical.empty and df_current.empty:
+        return df_historical
+
+    # Concatenar solo si hay datos válidos
     df_combined = pd.concat([df_historical, df_current]).drop_duplicates(subset=subset_columns, keep='last')
+
     return df_combined
 
 
@@ -147,15 +145,15 @@ def load_economics(dfs, client, indicators):
         the specified indicators.
     """
     for indicator in indicators:
-        print(f'Getting data: {{\'function\': {indicator}}}')
+        print(f'{get_time_now()} :: Getting data: {{\'function\': {indicator}}}')
         json_data = client.get_economic_indicator(indicator)
         if json_data:
             df_economic = Transformer.transform_economic_data(json_data)
             ut.write_csv(df_economic, f'data/df_{indicator}.csv')
             dfs[indicator] = df_economic
-            print(f'Getting data: {{\'function\': {indicator}}} saved successfully!')
+            print(f'{get_time_now()} :: Getting data: {{\'function\': {indicator}}} saved successfully!')
         else:
-            print(f'Error fetching data for {indicator}')
+            print(f'{get_time_now()} :: Getting data: Error fetching data for {indicator}')
     return dfs 
 
 
