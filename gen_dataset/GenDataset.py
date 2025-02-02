@@ -1,11 +1,16 @@
 import os
 import sys
-
-import utils.utils
 from utils.utils import get_time_now
 from gen_dataset.CheckNewsDataset import CheckNewsDataset
 from gen_dataset.CheckTecDataset import CheckTecDataset
 from gen_dataset.DatasetGenerator import DatasetGenerator
+from gen_dataset.FeatureEngineering import FeatureEngineering
+
+def feature_engineering(fe):
+    fe.add_lags()
+    fe.delete_no_necessary_col()
+
+    return fe
 
 def generate_dataset(gen):
     """
@@ -41,7 +46,7 @@ def check_tec_dataset(checker):
 def run_gen_dataset(dfs):
     """
     """
-    print(f'{utils.utils.get_time_now()} :: Dataset Generation: Starting dataset generation')
+    print(f'{get_time_now()} :: Dataset Generation: Starting dataset generation')
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
     tec_checker = CheckTecDataset(dfs['tec_info'])
     news_checker = CheckNewsDataset(dfs['news'],tec_checker.target_ticker)
@@ -49,7 +54,10 @@ def run_gen_dataset(dfs):
     tec = check_tec_dataset(tec_checker)
     news = check_news_dataset(news_checker)
 
-    ds_generator = DatasetGenerator(news_checker.df, tec_checker.df)
+    ds_generator = DatasetGenerator(news.df, tec.df)
     ds = generate_dataset(ds_generator)
+
+    feature = FeatureEngineering(ds.df)
+    ds = feature_engineering (feature)
 
     return ds.df

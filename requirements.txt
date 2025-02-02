@@ -3,3 +3,5 @@ matplotlib
 pandas
 pytest>=7.0.0
 pytest-mock>=3.0.0
+seaborn
+numpy

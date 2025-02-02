@@ -24,9 +24,9 @@
         "cumulative_change_in_volume": true
     },
     "tec_economic_indicators":{
-        "cpi": true,
-        "nonfarm_payroll": true,
-        "unemployment": true
+        "cpi": false,
+        "nonfarm_payroll": false,
+        "unemployment": false
     },
     "news_ticker_features": {
         "avg_sentiment_score": true,
@@ -44,8 +44,8 @@
         "finance": true
     },
     "news_aggregate_hours": {
-        "aggregate_news_execute": false,
-        "aggregate_news_horus": 12
+        "aggregate_news_execute": true,
+        "aggregate_news_horus": 3
     },
     "global_date_time_actions": {
         "date_split": true,

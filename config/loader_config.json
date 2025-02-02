@@ -2,6 +2,7 @@
     "historical_needed": false,
     "historical_year": 2022,
     "symbols": ["NVDA"],
+    "charge_new_values": false,
     "periods": {
         "sma": [5, 10, 12],
         "rsi": [5, 7, 9]

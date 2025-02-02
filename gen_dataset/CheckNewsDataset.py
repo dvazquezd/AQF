@@ -38,11 +38,11 @@ class CheckNewsDataset:
         }).reset_index()
 
         # Renombrar la columna del conteo para mayor claridad
-        self.df = self.df.rename(columns={'overall_sentiment_score': 'ticker_overall_sentiment_score_mean'})
-        self.df = self.df.rename(columns={'relevance_score': 'ticker_relevance_score_mean'})
-        self.df = self.df.rename(columns={'ticker_sentiment_score': 'ticker_sentiment_score_mean'})
-        self.df = self.df.rename(columns={'affected_topic_relevance_score': 'ticker_affected_topic_relevance_score_mean'})
-        self.df = self.df.rename(columns={'title': 'distinct_news_count'})
+        self.df = self.df.rename(columns={'overall_sentiment_score': 'ticker_ossm'})
+        self.df = self.df.rename(columns={'relevance_score': 'ticker_rsm'})
+        self.df = self.df.rename(columns={'ticker_sentiment_score': 'ticker_ssm'})
+        self.df = self.df.rename(columns={'affected_topic_relevance_score': 'ticker_atrsm'})
+        self.df = self.df.rename(columns={'title': 'ticker_nc'})
         self.df = self.df.sort_values(by='datetime')
 
         return self.df
@@ -109,9 +109,9 @@ class CheckNewsDataset:
             'affected_topic_relevance_score': lambda x: round(x.mean(), 6),
             'news_count': lambda x: x.mean()
         }).rename(columns={
-            'overall_sentiment_score': f'{topic}_overall_sentiment_score_mean',
-            'affected_topic_relevance_score': f'{topic}_affected_topic_relevance_score_mean',
-            'news_count': f'{topic}_distinct_news_count'
+            'overall_sentiment_score': f'{topic}_ossm',
+            'affected_topic_relevance_score': f'{topic}_atrsm',
+            'news_count': f'{topic}_nc'
         }).reset_index()
 
         return topic_metrics

@@ -1,86 +1,117 @@
-# Asset Quote Forecast Project with Alpha Vantage
+# **AQF - Automated Quantitative Forecasting**
 
-## Description
-This project uses historical pricing data, technical and economic indicators, as well as news analysis to predict an asset's price in the next hour. The data is provided by the Alpha Vantage API, and the system is designed to process this information and generate Machine Learning (ML) and Deep Learning (DL) models to achieve the highest possible accuracy.
+AQF is a data pipeline designed to fetch, process, and generate datasets for financial forecasting. It integrates financial data, technical indicators, economic indicators, and news sentiment analysis to build a robust dataset for machine learning or deep learning models.
 
-## Main Features
-- **Data Download**: Fetch historical price data, technical indicators (RSI, SMA, MACD), and economic indicators (nonfarm payrolls, CPI, unemployment rate) using the Alpha Vantage API.
-- **News Processing**: Analyze financial news, including sentiment scores and relevance.
-- **Dataset Generation**: Create combined datasets incorporating historical pricing, technical and economic indicators, and news data.
-- **Data Validation**: Validate and transform data for ML and DL models.
-- **Centralized Configuration**: Modular configuration system for customizable execution and storage parameters.
-
-## Project Structure
-
+## **Project Structure**
 ```
-.
-├── ApiClient.py         # Client to interact with the Alpha Vantage API.
-├── ConfigManager.py     # Centralized configuration management.
-├── DataLoader.py        # Data loading and storage.
-├── DataTransformer.py   # Data transformations and validation.
-├── GenDataset.py        # Combined dataset generation.
-├── CheckTecDataset.py   # Validation of technical datasets.
-├── utils.py             # Utility functions.
-├── main.py              # Main project script.
-├── loader.py            # Configuration loader system.
-├── loader_config.json   # Initial loader configuration.
-├── gen_dataset_config.json # Dataset generation configuration.
+AQF/
+├── config/                   # Configuration files
+│   ├── gen_dataset_config.json  # Config for dataset generation
+│   ├── loader_config.json       # Config for data loader
+├── data/                     # Raw and processed data storage
+│   ├── df_unemployment.csv   # Unemployment data
+│   ├── df_cpi.csv            # CPI data
+│   └── df_aqf.csv            # Final dataset output
+├── loader/                   # Data loading and transformation
+│   ├── loader.py             # Main script for data loading
+│   ├── DataLoader.py         # Handles fetching and merging financial data
+│   ├── DataTransformer.py    # Transforms data from the API response
+│   ├── ApiClient.py          # API client to interact with Alpha Vantage
+├── gen_dataset/              # Dataset generation
+│   ├── GenDataset.py         # Runs the dataset generation pipeline
+│   ├── CheckNewsDataset.py   # Processes news sentiment data
+│   ├── CheckTecDataset.py    # Processes technical indicators and market data
+│   ├── DatasetGenerator.py   # Merges and cleans datasets
+├── models/                   # Model training and evaluation (to be implemented)
+├── utils/                    # Utility functions
+│   ├── utils.py              # General helper functions
+│   ├── ConfigLogger.py       # Logs configuration history
+├── main.py                   # Entry point for running the pipeline
+└── README.md                 # Project documentation
 ```
 
-## Installation and Configuration
-
-### Prerequisites
-- Python 3.8 or higher
-- Alpha Vantage API keys
-- Libraries listed in `requirements.txt`
-
-### Installation
-1. Clone the repository:
+## **Installation & Setup**
+1. **Clone the repository**:
    ```bash
-   git clone https://github.com/your_username/your_repository.git
-   cd your_repository
+   git clone https://github.com/your-repo/AQF.git
+   cd AQF
    ```
-2. Install the dependencies:
+
+2. **Set up a virtual environment**:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies**:
    ```bash
    pip install -r requirements.txt
    ```
 
-### Configuration
-1. Define your API keys and other parameters in `loader_config.json` and `gen_dataset_config.json`.
-2. Adjust settings in `ConfigManager.py` as needed.
+4. **Set API Key**:
+   - Export the Alpha Vantage API key:
+     ```bash
+     export ALPHAVKEY=your_api_key
+     ```
+   - On Windows (PowerShell):
+     ```powershell
+     $env:ALPHAVKEY="your_api_key"
+     ```
 
-## Usage
+## **Usage**
+### **1. Running the Data Pipeline**
+Run the `main.py` script to fetch, process, and generate datasets:
+```bash
+python main.py
+```
 
-1. **Run the main script**:
-   ```bash
-   python main.py
-   ```
-2. **General workflow**:
-   - The script downloads the necessary data using `ApiClient.py`.
-   - Transforms and validates it with `DataTransformer.py`.
-   - Generates combined datasets using `GenDataset.py`.
+### **2. How It Works**
+- **Data Loading (`loader.py`)**
+  - Fetches **intraday stock price data**, **technical indicators** (SMA, RSI, MACD), and **economic indicators** (CPI, unemployment, nonfarm payroll).
+  - Fetches **news sentiment data**, filtering relevant news by ticker and affected topics.
+  - Merges all data into a structured format.
 
-## Technical Details
+- **Dataset Processing (`GenDataset.py`)**
+  - Cleans and processes missing data.
+  - Generates **news-based features** such as sentiment scores and topic relevance.
+  - Applies **technical analysis transformations** like volatility and trend detection.
+  - Creates the **target variable** for prediction.
 
-### Key Methods and Functions
-#### ApiClient.py
-- `get_technical_data()`: Retrieves technical indicators.
-- `get_economic_data()`: Downloads economic data.
+- **Final Dataset (`df_aqf.csv`)**
+  - Stored in `data/df_aqf.csv`, ready for model training.
 
-#### DataTransformer.py
-- `validate_data()`: Validates data quality.
-- `transform_data()`: Performs required transformations for ML/DL models.
+## **Key Components**
+### **1. Data Collection**
+- **Market Data (`DataLoader.py`)**
+  - Retrieves historical stock prices and technical indicators.
+  - Merges with macroeconomic indicators.
 
-#### GenDataset.py
-- `generate_dataset()`: Creates an integrated dataset from multiple data sources.
+- **News Sentiment (`CheckNewsDataset.py`)**
+  - Filters news by ticker.
+  - Aggregates sentiment scores and topic relevance.
 
-## Contribution
-Contributions are welcome. Please open an issue or a pull request in the repository.
+### **2. Feature Engineering**
+- **Technical Features (`CheckTecDataset.py`)**
+  - Computes SMA, RSI, and MACD indicators.
+  - Extracts volatility and trend information.
+  - Cleans and normalizes missing values.
 
-## License
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+- **News-Based Features (`CheckNewsDataset.py`)**
+  - Computes average sentiment scores per hour.
+  - Measures topic relevance and news volume impact.
 
-## Contact
-- **Author**: David Vázquez Doce
-- **Email**: [dvazquezd@gmail.com](mailto:dvazquezd@gmail.com)
-- **GitHub**: [https://github.com/dvazquezd](https://github.com/dvazquezd)
+- **Temporal Features (`DatasetGenerator.py`)**
+  - Aggregates past-hour statistics.
+  - Assigns target labels for price movement prediction.
+
+## **Planned Enhancements**
+✅ **Next steps:**
+- Train and evaluate ML/DL models using `models/`
+- Optimize dataset aggregation methods
+- Implement a backtesting framework
+
+---
+
+### **Author**
+David Vázquez Doce
+
