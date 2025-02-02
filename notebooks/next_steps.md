@@ -1,0 +1,70 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    " 1. Análisis Exploratorio de Datos (EDA)\n",
+    "Antes de entrenar modelos, debemos analizar qué variables pueden ser más relevantes para la predicción.\n",
+    "\n",
+    "✅ Tareas a realizar:\n",
+    "Cargar y visualizar el dataset\n",
+    "\n",
+    "Verificar estructura (df.info(), df.describe())\n",
+    "Identificar valores nulos o atípicos (df.isnull().sum())\n",
+    "Distribución del target (target)\n",
+    "\n",
+    "Verificar balance de clases (df['target'].value_counts())\n",
+    "Si está desbalanceado, considerar técnicas de balanceo (SMOTE, undersampling, etc.)\n",
+    "Análisis de correlación\n",
+    "\n",
+    "Matriz de correlación entre variables (df.corr())\n",
+    "Identificar qué variables tienen alta correlación con el target\n",
+    "Análisis de importancia de variables\n",
+    "\n",
+    "Usar modelos basados en árboles (RandomForest, XGBoost) para medir importancia de features\n",
+    "⚙ 2. Feature Engineering\n",
+    "Una vez entendido el dataset, podemos crear nuevas características y descartar las menos relevantes.\n",
+    "\n",
+    "✅ Posibles mejoras en las features:\n",
+    "✔ Feature Scaling: Normalización o estandarización de indicadores técnicos y económicos.\n",
+    "✔ Lags & Moving Averages: Agregar ventanas móviles de indicadores (RSI, MACD, SMA, volatilidad).\n",
+    "✔ Diferencias y ratios: Cambios porcentuales en close, volume, RSI, etc.\n",
+    "✔ Interacción de variables: Cruce entre sentiment_score y price_trend.\n",
+    "✔ Encoding de fecha: Convertir day_of_week, is_market en variables categóricas.\n",
+    "\n",
+    "🤖 3. Selección de Modelos de Machine Learning\n",
+    "Queremos predecir si el precio sube o baja en la siguiente hora. Podemos probar varios modelos y comparar su desempeño.\n",
+    "\n",
+    "✅ Modelos candidatos:\n",
+    "Modelo\tCaracterísticas\n",
+    "Logistic Regression\tRápido y fácil de interpretar, pero limitado\n",
+    "Random Forest\tBuen desempeño con datos tabulares, captura relaciones no lineales\n",
+    "XGBoost\tMás preciso que RF, pero necesita ajuste de hiperparámetros\n",
+    "LSTM (Red Neuronal)\tBueno para secuencias, pero requiere más datos y ajuste\n",
+    "SVM\tFunciona bien en espacios de alta dimensión, pero es lento\n",
+    "Métricas clave para evaluar los modelos\n",
+    "✔ Accuracy: Qué tan bien clasifica en general.\n",
+    "✔ Precision-Recall: Evaluar bien los falsos positivos y negativos.\n",
+    "✔ Matriz de confusión: Para ver dónde se equivoca el modelo.\n",
+    "✔ AUC-ROC: Medir la capacidad del modelo de distinguir entre subida y bajada.\n",
+    "\n",
+    "🚀 4. Entrenamiento y Evaluación del Modelo\n",
+    "Ahora podemos probar los modelos y ver cuál funciona mejor.\n",
+    "\n",
+    "✅ Pasos:\n",
+    "Dividir los datos en entrenamiento (70%), validación (15%) y prueba (15%).\n",
+    "Entrenar modelos con GridSearchCV para optimizar hiperparámetros.\n",
+    "Evaluar desempeño y comparar modelos.\n",
+    "Guardar el mejor modelo y realizar predicciones en tiempo real.\n"
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

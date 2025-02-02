@@ -1,14 +1,30 @@
 {
     "historical_needed": false,
+    "charge_new_values": false,
     "historical_year": 2022,
     "symbols": ["NVDA"],
-    "charge_new_values": false,
     "periods": {
         "sma": [5, 10, 12],
         "rsi": [5, 7, 9]
     },
     "economic_indicators": ["unemployment", "nonfarm_payroll", "cpi"],
-    "topics": ["technology", "financial_markets", "economy_macro", "economy_monetary", "economy_fiscal","finance"],
+    "topics": [
+        "technology",
+        "financial_markets",
+        "economy_macro",
+        "economy_monetary",
+        "economy_fiscal",
+        "finance",
+        "blockchain",
+        "earnings",
+        "ipo",
+        "mergers_and_acquisitions",
+        "energy_transportation",
+        "life_sciences",
+        "manufacturing",
+        "real_estate",
+        "retail_wholesale"
+    ],
     "dataframes": {
         "ticker": {},
         "macd": {},

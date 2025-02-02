@@ -1,4 +1,5 @@
 {
+    "tec_delete_no_news_dates": true,
     "tec_correction_methods": {
         "forward_fill": false,
         "backward_fill": false,
@@ -36,16 +37,25 @@
         "sentiment_change": true
     },
     "news_topic_features": {
-        "technology": true,
-        "financial_markets": true,
-        "economy_macro": true,
-        "economy_monetary": true,
-        "economy_fiscal": true,
-        "finance": true
+        "blockchain":  false,
+        "earnings":  false,
+        "ipo": false,
+        "mergers_and_acquisitions": false,
+        "financial_markets": false,
+        "economy_macro": false,
+        "economy_monetary": false,
+        "economy_fiscal": false,
+        "energy_transportation": false,
+        "finance": false,
+        "life_sciences": false,
+        "manufacturing": false,
+        "real_estate": false,
+        "retail_wholesale": false,
+        "technology" : true
     },
     "news_aggregate_hours": {
         "aggregate_news_execute": true,
-        "aggregate_news_horus": 3
+        "aggregate_news_horus": 5
     },
     "global_date_time_actions": {
         "date_split": true,

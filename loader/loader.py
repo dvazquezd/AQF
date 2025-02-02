@@ -21,17 +21,21 @@ def run_loader():
 
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-    months = ut.get_months(config['historical_year'], config['historical_needed'])
-    dataframes = DataLoader.load_data(dataframes, client, config['symbols'], months, config['periods'])
-    dataframes = DataLoader.load_economics(dataframes, client, config['economic_indicators'])
-    dataframes = DataLoader.load_news(dataframes, client, months, config['topics'])
-    dataframes = DataLoader.merge_datasets(dataframes, config['periods'], config['tec_columns'], config['economic_columns'])
+    if config['charge_new_values']:
+        months = ut.get_months(config['historical_year'], config['historical_needed'])
+        dataframes = DataLoader.load_data(dataframes, client, config['symbols'], months, config['periods'])
+        dataframes = DataLoader.load_economics(dataframes, client, config['economic_indicators'])
+        dataframes = DataLoader.load_news(dataframes, client, months, config['topics'])
+        dataframes = DataLoader.merge_datasets(dataframes, config['periods'], config['tec_columns'], config['economic_columns'])
 
-    if config['historical_needed']:
-        DataLoader.save_dataframes(dataframes)
-        return {'tec_info': dataframes['merged_tec_info'], 'news': dataframes['news']}        
-    else:
+        if config['historical_needed']:
+            DataLoader.save_dataframes(dataframes)
+            return {'tec_info': dataframes['merged_tec_info'], 'news': dataframes['news']}
+
         h_dataframes = DataLoader.retrieve_data(h_dataframes)
         f_dataframes = DataLoader.combine_dataframes(h_dataframes, dataframes, f_dataframes, config['combine_configuration'])
         DataLoader.save_dataframes(f_dataframes)
         return {'tec_info': f_dataframes['merged_tec_info'], 'news': f_dataframes['news']}
+
+    h_dataframes = DataLoader.retrieve_data(h_dataframes)
+    return {'tec_info': h_dataframes['merged_tec_info'], 'news': h_dataframes['news']}

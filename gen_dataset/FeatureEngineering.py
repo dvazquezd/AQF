@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
-from pandas.core.interchange import column
-
 from utils.utils import load_config
+from imblearn.under_sampling import RandomUnderSampler
+from imblearn.over_sampling import SMOTE
+
 
 class FeatureEngineering:
     def __init__(self, df):
@@ -14,18 +15,19 @@ class FeatureEngineering:
         self.config = load_config('feature_eng_config')  # Carga la configuración desde JSON
         self.numeric_columns = self.df.select_dtypes(include=['number']).columns.tolist()
         self.all_columns = self.df.columns.tolist()
+        self.need_balance = 0
 
     def add_lags(self):
         """
         """
         for feature in self.numeric_columns:
             if self.config["apply_lag"].get(feature, False):
-                for lag in self.config['lag']:
+                for lag in self.config['lags']:
                     self.df[f"{feature}_lag{lag}"] = self.df[feature].shift(lag)
 
         return self
 
-    def add_moving_averages(self):
+    def add_moving_avg(self):
         """
         """
         for feature in self.numeric_columns:
@@ -100,12 +102,111 @@ class FeatureEngineering:
     def delete_no_necessary_col(self):
         """
         """
-        print(self.all_columns)
         for column_name in self.all_columns:
             if self.config["delete_original_columns"].get(column_name, False):
                 self.df.drop(column_name, axis=1, inplace=True)
 
         return self
 
+    def add_advanced_features(self):
+        """
+        """
+        # Indicadores avanzados
+        if self.config["advanced_indicators"].get("intraday_volatility", False):
+            self.add_intraday_volatility()
 
+        if self.config["advanced_indicators"].get("volume_ratio", False):
+            self.add_volume_ratio()
+
+        if self.config["advanced_indicators"].get("price_trend", False):
+            self.add_price_trend()
+
+        # Análisis de ciclos
+        if self.config["cycle_analysis"].get("monthly_cycle", False):
+            self.add_monthly_cycle()
+
+        if self.config["cycle_analysis"].get("yearly_cycle", False):
+            self.add_yearly_cycle()
+
+        # Perspectiva agregada
+        if self.config["aggregated_perspective"].get("closing_moving_avg", False):
+            self.add_closing_moving_avg()
+
+        if self.config["aggregated_perspective"].get("cumulative_change_in_volume", False):
+            self.add_cumulative_change_in_volume()
+
+        return self.df
+
+    def add_intraday_volatility(self):
+        """
+        """
+        self.df["intraday_volatility"] = (self.df["high"] - self.df["low"]).round(4)
+        return self.df
+
+    def add_volume_ratio(self):
+        """
+        """
+        self.df["volume_ratio"] = (self.df["volume"] / self.df["volume"].rolling(window=5, min_periods=1).mean()).round(4)
+        return self.df
+
+    def add_price_trend(self):
+        """
+        """
+        self.df["price_trend"] = self.df["close"].pct_change().round(4)
+        return self.df
+
+    def add_monthly_cycle(self):
+        """
+        """
+        self.df["month_cycle"] = self.df["day"]
+        return self.df
+
+    def add_yearly_cycle(self):
+        """
+        """
+        self.df["yearly_cycle"] = self.df["datetime"].dt.quarter
+        return self.df
+
+    def add_closing_moving_avg(self):
+        """
+        """
+        self.df["closing_moving_avg"] = self.df["close"].rolling(window=5, min_periods=1).mean().round(4)
+        return self.df
+
+    def add_cumulative_change_in_volume(self):
+        """
+        """
+        self.df["cumulative_change_in_volume"] = self.df["volume"].cumsum().round(4)
+        return self.df
+
+    def final_ds_checks(self):
+        """
+        Performs final checks on a dataset for missing values and target class distribution.
+
+        This method conducts two primary checks on the dataset:
+        1. Identifies and removes rows with any missing values.
+        2. Assesses the distribution of a categorical target variable to determine if
+           class balancing is required. If the smallest class occupies less than 39%
+           of the data, the need for balancing is flagged.
+
+        Raises:
+            ValueError: Raised if the dataset doesn't contain the 'target' column.
+
+        Attributes:
+            df (DataFrame): Pandas DataFrame containing the dataset. It is updated
+                in place to remove rows with missing values if they are detected.
+            need_balance (int): Set to 1 if the distribution check identifies a
+                need for balancing the target variable class representation. Defaults
+                to 0 otherwise.
+        """
+        missing_values = self.df.isnull().sum()
+        print(type(missing_values))
+        if missing_values.sum() > 0:
+            self.df = self.df.dropna()
+
+        target_distribution = self.df["target"].value_counts(normalize=True) * 100
+        min_class_percentage = target_distribution.min()
+
+        if min_class_percentage < 39:
+            self.need_balance = 1
 
