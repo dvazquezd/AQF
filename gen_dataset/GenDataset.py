@@ -8,7 +8,10 @@ from gen_dataset.FeatureEngineering import FeatureEngineering
 
 def feature_engineering(fe):
     fe.add_lags()
+    fe.add_advanced_features()
+    fe.add_moving_avg()
     fe.delete_no_necessary_col()
+    fe.final_ds_checks()
 
     return fe
 
@@ -26,6 +29,7 @@ def check_news_dataset(checker):
     """
     checker.generate_ticker_features()
     checker.generate_topic_features()
+    checker.generate_news_global_metrics()
 
     return checker
 
@@ -37,7 +41,6 @@ def check_tec_dataset(checker):
     checker.calculate_missing_indicators()
     checker.apply_date_time_actions()
     checker.apply_corrections()
-    checker.apply_advanced_features()
     checker.get_target_ticker()
 
     return checker

@@ -17,7 +17,7 @@ def main():
 
     df_aqf.to_csv('data/df_aqf.csv',encoding='utf-8',index=False)
 
-    eda.run_eda(df_aqf)
+    #eda.run_eda(df_aqf)
 
 
     # 3. Entrenar y evaluar modelo

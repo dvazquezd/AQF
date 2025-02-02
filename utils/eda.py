@@ -11,10 +11,10 @@ def inspect_dataset(df):
     print(f'\n{get_time_now()} :: EDA: Dataset general info:')
     print(df.info())
 
-    print("\n Estadísticas descriptivas:")
+    print("\n Descriptive statistics:")
     print(df.describe())
 
-    print("\n Valores nulos por columna:")
+    print("\n NaN per column:")
     print(df.isnull().sum())
 
 def plot_target_distribution(df):
@@ -28,9 +28,9 @@ def plot_target_distribution(df):
     plt.ylabel("Cantidad de Registros")
     plt.show()
 
-def plot_correlation_matrix(df):
+def plot_pearson_correlation_matrix(df):
     """
-    Grafica la matriz de correlación entre variables numéricas.
+    correlación de Pearson
     """
     # Filtrar solo columnas numéricas
     numeric_df = df.select_dtypes(include=['number'])
@@ -41,16 +41,15 @@ def plot_correlation_matrix(df):
         return
 
     # Calcular y graficar la matriz de correlación
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(18, 12))
     corr_matrix = numeric_df.corr()
     sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap="coolwarm", linewidths=0.5, annot_kws={"size": 8})
 
-    plt.title("Matriz de Correlación de Variables Numéricas")
+    plt.title("Pearson correlation matrix - numeric variables")
     plt.show()
 
 def plot_price_trend(df):
     """
-    Grafica la evolución del precio de cierre.
     """
     plt.figure(figsize=(12, 5))
     df["datetime"] = pd.to_datetime(df["datetime"])
@@ -64,7 +63,6 @@ def plot_price_trend(df):
 
 def plot_technical_indicators(df):
     """
-    Grafica histogramas de indicadores técnicos.
     """
     indicators = ["rsi_5", "rsi_7", "rsi_9", "sma_5", "sma_10", "sma_12", "MACD"]
     if indicators[0] in df.columns:
@@ -98,12 +96,11 @@ def plot_sentiment_vs_target(df):
 
 def run_eda(df):
     """
-    Ejecuta el análisis exploratorio de datos (EDA).
     """
     if df is not None:
-        inspect_dataset(df)
+        #inspect_dataset(df)
         #plot_target_distribution(df)
-        plot_correlation_matrix(df)
+        plot_pearson_correlation_matrix(df)
         plot_price_trend(df)
         plot_technical_indicators(df)
         plot_economic_indicators(df)

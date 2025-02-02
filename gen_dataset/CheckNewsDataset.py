@@ -49,12 +49,21 @@ class CheckNewsDataset:
 
     def normalize_topic_names(self):
         self.original_df['affected_topic'] = self.original_df['affected_topic'].replace({
-            'Technology': 'technology',
+            'Blockchain': 'blockchain',
+            'Earnings': 'earnings',
+            'IPO': 'ipo',
+            'Mergers & Acquisitions': 'mergers_and_acquisitions',
             'Financial Markets': 'financial_markets',
             'Economy - Macro': 'economy_macro',
             'Economy - Monetary': 'economy_monetary',
             'Economy - Fiscal': 'economy_fiscal',
-            'Finance': 'finance'
+            'Energy & Transportation': 'energy_transportation',
+            'Finance': 'finance',
+            'Life Sciences': 'life_sciences',
+            'Manufacturing': 'manufacturing',
+            'Real Estate & Construction': 'real_estate',
+            'Retail & Wholesale': 'retail_wholesale',
+            'Technology': 'technology'
         })
 
         return self.original_df
@@ -115,3 +124,23 @@ class CheckNewsDataset:
         }).reset_index()
 
         return topic_metrics
+
+    def generate_news_global_metrics(self):
+        """
+        """
+        news_data = self.original_df[
+            ['datetime', 'title', 'overall_sentiment_score', 'relevance_score']].drop_duplicates()
+        news_data[['overall_sentiment_score', 'relevance_score']] = news_data[
+            ['overall_sentiment_score', 'relevance_score']].apply(pd.to_numeric, errors='coerce')
+
+        global_metrics = news_data.groupby('datetime').agg({
+            'overall_sentiment_score': lambda x: round(x.mean(), 6),
+            'relevance_score': lambda x: round(x.mean(), 6)
+        }).rename(columns={
+            'overall_sentiment_score': 'all_news_ossm',
+            'relevance_score': 'all_news_rsm'
+        }).reset_index()
+
+        self.df = self.intermediate_dataset(global_metrics)
+
+        return self.df

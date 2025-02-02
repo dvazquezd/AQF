@@ -53,7 +53,7 @@ class DatasetGenerator:
         self.df = pd.merge(self.df_tec, self.df, on='datetime', how='left')
         if "close" in self.df.columns:  # Asegurar que la columna 'close' existe
             self.df["target"] = (self.df["close"].shift(-1) > self.df["close"]).astype(int)  # 1 si sube, 0 si baja
-            #self.df['target'] = (self.df['close'].shift(-1) / self.df['close'] - 1)
+            self.df['target_percent'] = (self.df['close'].shift(-1) / self.df['close'] - 1)
 
             self.df["close_pct_change"] = (
                         (self.df["close"] - self.df["close"].shift(1)) / self.df["close"].shift(1)).round(6)

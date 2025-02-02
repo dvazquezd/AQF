@@ -326,77 +326,6 @@ class CheckTecDataset:
 
         return self.df
 
-    def apply_advanced_features(self):
-        """
-        """
-        # Indicadores avanzados
-        if self.config["tec_advanced_indicators"].get("intraday_volatility", False):
-            self.add_intraday_volatility()
-
-        if self.config["tec_advanced_indicators"].get("volume_ratio", False):
-            self.add_volume_ratio()
-
-        if self.config["tec_advanced_indicators"].get("price_trend", False):
-            self.add_price_trend()
-
-        # Análisis de ciclos
-        if self.config["tec_cycle_analysis"].get("monthly_cycle", False):
-            self.add_monthly_cycle()
-
-        if self.config["tec_cycle_analysis"].get("yearly_cycle", False):
-            self.add_yearly_cycle()
-
-        # Perspectiva agregada
-        if self.config["tec_aggregated_perspective"].get("closing_moving_avg", False):
-            self.add_closing_moving_avg()
-
-        if self.config["tec_aggregated_perspective"].get("cumulative_change_in_volume", False):
-            self.add_cumulative_change_in_volume()
-
-        return self.df
-
-    def add_intraday_volatility(self):
-        """
-        """
-        self.df["intraday_volatility"] = (self.df["high"] - self.df["low"]).round(4)
-        return self.df
-
-    def add_volume_ratio(self):
-        """
-        """
-        self.df["volume_ratio"] = (self.df["volume"] / self.df["volume"].rolling(window=5, min_periods=1).mean()).round(4)
-        return self.df
-
-    def add_price_trend(self):
-        """
-        """
-        self.df["price_trend"] = self.df["close"].pct_change().round(4)
-        return self.df
-
-    def add_monthly_cycle(self):
-        """
-        """
-        self.df["month_cycle"] = self.df["day"]
-        return self.df
-
-    def add_yearly_cycle(self):
-        """
-        """
-        self.df["yearly_cycle"] = self.df["datetime"].dt.quarter
-        return self.df
-
-    def add_closing_moving_avg(self):
-        """
-        """
-        self.df["closing_moving_avg"] = self.df["close"].rolling(window=5, min_periods=1).mean().round(4)
-        return self.df
-
-    def add_cumulative_change_in_volume(self):
-        """
-        """
-        self.df["cumulative_change_in_volume"] = self.df["volume"].cumsum().round(4)
-        return self.df
-
     def get_target_ticker(self):
         """
         """
@@ -408,3 +337,15 @@ class CheckTecDataset:
             raise ValueError("Se esperaba un único ticker en el dataset técnico, pero se encontraron múltiples o ninguno.")
 
         return tickers[0]
+
+    def delete_no_news_dates(self):
+        if self.config["tec_delete_no_news_dates"]:
+            cutoff_date = pd.Timestamp("2022-03-01")  # Fecha límite para mantener registros
+            initial_size = len(self.df)
+
+            # Filtrar registros manteniendo solo aquellos a partir de la fecha límite
+            self.df = self.df[self.df["datetime"] >= cutoff_date].reset_index(drop=True)
+
+            removed_rows = initial_size - len(self.df)
+            print(
+                f"{ut.get_time_now()} :: Dataset generation: Removed {removed_rows} row on dates previous to {cutoff_date}.")
