@@ -172,7 +172,7 @@ class CheckTecDataset:
 
             return self.df
         else:
-            print(f"{ut.get_time_now()} ::  Dataset generation: The 'is_incomplete' row does not exists in dataset. Rows have not been removed.")
+            print(f"{ut.get_time_now()} ::  Dataset Generation: The 'is_incomplete' row does not exists in dataset. Rows have not been removed.")
 
     def split_date(self):
         """

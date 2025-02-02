@@ -1,5 +1,4 @@
 import os
-import json
 import pandas as pd
 from datetime import datetime
 from utils.utils import load_config, get_time_now

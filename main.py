@@ -3,7 +3,7 @@ import sys
 import loader.loader as loader
 import gen_dataset.GenDataset as GenDataset
 from utils.ConfigLogger import ConfigLogger
-#import models.scripts.train as model_train
+import utils.eda as eda
 
 def main():
     """
@@ -16,6 +16,9 @@ def main():
     df_aqf = GenDataset.run_gen_dataset(dataframes)
 
     df_aqf.to_csv('data/df_aqf.csv',encoding='utf-8',index=False)
+
+    eda.run_eda(df_aqf)
+
 
     # 3. Entrenar y evaluar modelo
     #model = model_train.train_and_evaluate(dataset)
