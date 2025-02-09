@@ -7,3 +7,4 @@ seaborn
 numpy
 scipy
 imblearn
+scikit-learn

@@ -1,8 +1,7 @@
 import pandas as pd
 import numpy as np
-from utils.utils import load_config
-#from imblearn.under_sampling import RandomUnderSampler
-#from imblearn.over_sampling import SMOTE
+import utils.utils as ut
+
 
 
 class FeatureEngineering:
@@ -23,16 +22,13 @@ class FeatureEngineering:
             numeric_columns (list[str]): List of column names that are of numeric data
                 type from the dataset being managed.
             all_columns (list[str]): List of all column names present in the dataset.
-            balance_needed (bool): Flag indicating whether class balancing is required
-                or not.
         """
 
         self.df_original = df.copy()  # Save a copy of the original dataset
         self.df = df.copy()  # Dataset on which we apply transformations
-        self.config = load_config('feature_eng_config')  # Load the configuration from JSON
+        self.config = ut.load_config('feature_eng_config')  # Load the configuration from JSON
         self.numeric_columns = self.df.select_dtypes(include=['number']).columns.tolist()
         self.all_columns = self.df.columns.tolist()
-        self.balance_needed = False
 
     def add_lags(self):
         """
@@ -396,32 +392,4 @@ class FeatureEngineering:
         """
         self.df['cumulative_change_in_volume'] = self.df['volume'].cumsum().round(4)
         return self.df
-
-    def final_ds_checks(self):
-        """
-        Performs final dataset checks, including handling missing values and verifying
-        the target class distribution. Identifies if class imbalance might necessitate
-        further corrective measures.
-
-        Attributes
-        ----------
-        balance_needed: bool
-            Indicator of whether re-balancing of the target distribution is deemed
-            necessary.
-
-        Methods
-        -------
-        final_ds_checks()
-            Cleans missing values and assesses target class distribution to check for
-            re-balancing necessity.
-        """
-        missing_values = self.df.isnull().sum()
-        if missing_values.sum() > 0:
-            self.df = self.df.dropna()
-
-        target_distribution = self.df['target'].value_counts(normalize=True) * 100
-        min_class_percentage = target_distribution.min()
-
-        if min_class_percentage < 39:
-            self.balance_needed = True
 

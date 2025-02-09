@@ -32,7 +32,6 @@ def feature_engineering(fe):
     fe.add_advanced_features()
     fe.add_moving_avg()
     fe.delete_no_necessary_col()
-    fe.final_ds_checks()
 
     return fe
 
@@ -143,4 +142,4 @@ def run_gen_dataset(dfs):
 
     print(f'{get_time_now()} :: Dataset Generation: Dataset generation ended')
 
-    return ds.df, ds.balance_needed
+    return ds.df

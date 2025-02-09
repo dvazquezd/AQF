@@ -91,9 +91,5 @@
     "aggregated_perspective":{
         "closing_moving_avg": true,
         "cumulative_change_in_volume": true
-    },
-    "dataset_balance":{
-        "undersampling": true,
-        "smote": false
     }
 }
