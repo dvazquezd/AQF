@@ -5,16 +5,34 @@ import utils.utils as ut
 import loader.DataLoader as DataLoader
 from loader.ApiClient import ApiClient
 
-
-
 def run_loader():
     """
+    Executes the data loading and preprocessing workflow based on configuration.
+
+    The function is designed to load, process, and save financial and economic
+    data based on the parameters specified in the configuration file. It
+    initializes data structures, manages historical and current data loading
+    conditions, and processes datasets using specified operations. The function
+    determines whether to charge new values, retrieve historical data, or
+    combine datasets based on config settings.
+
+    Parameters:
+    None
+
+    Returns:
+    dict: A dictionary containing processed technical information ('tec_info')
+          and news data ('news') in respective keys.
+
+    Raises:
+    KeyError: Raised if a required key is missing from the configuration.
+    ValueError: Raised if the configuration values are invalid or do not match
+                expected formats.
     """
-    # Objetos
+    # Objects
     client = ApiClient()
     config = ut.load_config('loader_config')
 
-    # Crear dataframes vacíos
+    # Create empty dataframes
     dataframes = {key: pd.DataFrame() for key in config['dataframes']}
     h_dataframes = dataframes.copy()
     f_dataframes = dataframes.copy()

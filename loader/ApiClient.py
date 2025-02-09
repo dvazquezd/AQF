@@ -36,15 +36,17 @@ class ApiClient:
 
         """
         current_time = time.time()
-        self.requests_made = [t for t in self.requests_made if current_time - t < 60]  # Mantiene solo las solicitudes del último minuto
-        
-        if len(self.requests_made) >= 75:  # Si hemos hecho 75 peticiones en el último minuto
-            time_stamp = datetime.now()
-            sleep_time = 60 - (current_time - self.requests_made[0])  # Calcular el tiempo que falta para completar el minuto
-            print(f"{time_stamp.strftime("%Y-%m-%d %H:%M:%S")} :: Límite de 75 peticiones por minuto alcanzado. Tiempo de espera {sleep_time:.2f} segundos.")
-            time.sleep(sleep_time)  # Pausar hasta que podamos hacer más peticiones
+        # Keeps only requests from the last minute
+        self.requests_made = [t for t in self.requests_made if current_time - t < 60]
 
-        self.requests_made.append(current_time)  # Añadir el timestamp de la nueva petición
+        if len(self.requests_made) >= 75:  #If we have made 75 requests in the last minute
+            time_stamp = datetime.now()
+            sleep_time = 60 - (current_time - self.requests_made[0])  #Calculate the remaining time to complete the minute
+            print(f"{time_stamp.strftime('%Y-%m-%d %H:%M:%S')} :: Limit of 75 requests per minute reached. Waiting time"
+                  f" {sleep_time:.2f} seconds.")
+            time.sleep(sleep_time)  # Pause until we can make more requests
+
+        self.requests_made.append(current_time)  # Adding timestamp to the new request
 
     def _get(self, params):
         """
@@ -65,7 +67,7 @@ class ApiClient:
             dict | None: A dictionary containing the JSON-parsed data of the response
             if successful, or None in case of an error or invalid response.
         """
-        self._control_rate_limit()  # Controlar el rate limit antes de hacer la solicitud
+        self._control_rate_limit()  # Check the rate limit before making the request
         params['apikey'] = self.apiKey
         try:
             response = requests.get(self.baseUrl, params=params)
@@ -73,12 +75,12 @@ class ApiClient:
             data = response.json()
             if not data or "Error" in data:
                 time_stamp = datetime.now()
-                print(f"{time_stamp.strftime("%Y-%m-%d %H:%M:%S")} :: Error in API response: {data}")
+                print(f"{time_stamp.strftime('%Y-%m-%d %H:%M:%S')} :: Error in API response: {data}")
                 return None
             return data
         except requests.exceptions.RequestException as e:
             time_stamp = datetime.now()
-            print(f"{time_stamp.strftime("%Y-%m-%d %H:%M:%S")} :: Request failed: {e}")
+            print(f"{time_stamp.strftime('%Y-%m-%d %H:%M:%S')} :: Request failed: {e}")
             return None
 
     def get_data(self, function, symbol, **kwargs):
@@ -109,28 +111,28 @@ class ApiClient:
             'function': function,
             'symbol': symbol
             }
-        
+
         params.update(kwargs)
         time_stamp = datetime.now()
-        print(f'{time_stamp.strftime("%Y-%m-%d %H:%M:%S")} :: Getting data: {params} ')
+        print(f"{time_stamp.strftime('%Y-%m-%d %H:%M:%S')} :: Getting data: {params} ")
         data = self._get(params)
 
-        # Definir la clave correspondiente según el tipo de función solicitada
-        if function == 'NEWS_SENTIMENT':  # Supongamos que 'NEWS' es el nombre para solicitar datos de noticias
+        # Define the corresponding key according to the requested function type
+        if function == 'NEWS_SENTIMENT':
             analysis_key = 'feed'
         elif function == 'TIME_SERIES_INTRADAY':
             analysis_key = 'Time Series (60min)'
         else:
             analysis_key = f'Technical Analysis: {function}'
-    
-        # Validar y devolver los datos correspondientes
+
+        # Validate and return the corresponding data
         if data and analysis_key in data:
             return data[analysis_key]
         else:
             time_stamp = datetime.now()
-            print(f'{time_stamp.strftime("%Y-%m-%d %H:%M:%S")} :: Error o datos no encontrados en la respuesta')
+            print(f"{time_stamp.strftime('%Y-%m-%d %H:%M:%S')} :: Error, data not found")
             return None
- 
+
     def get_economic_indicator(self, function):
         """
         Fetches economic indicator data based on the specified function.
@@ -149,9 +151,9 @@ class ApiClient:
             'function': function
         }
         return self._get(params)
-    
-    # Métodos para funciones específicas
-    def get_intraday_data(self, symbol, month=None, interval='60min', outputsize='full', entitlement ='delayed', extended_hours='true'):
+
+    def get_intraday_data(self, symbol, month=None, interval='60min', outputsize='full', entitlement ='delayed',
+                          extended_hours='true'):
         """
         Fetches intraday time series data for a specific stock symbol.
 
@@ -183,9 +185,11 @@ class ApiClient:
         Raises:
             N/A
         """
-        return self.get_data('TIME_SERIES_INTRADAY', symbol, interval=interval, outputsize=outputsize, entitlement=entitlement, extended_hours=extended_hours, month=month)
+        return self.get_data('TIME_SERIES_INTRADAY', symbol, interval=interval, outputsize=outputsize,
+                             entitlement=entitlement, extended_hours=extended_hours, month=month)
 
-    def get_sma(self, symbol, month=None, time_period=200, interval='60min', series_type='close', entitlement ='delayed', extended_hours='true'):
+    def get_sma(self, symbol, month=None, time_period=200, interval='60min', series_type='close', entitlement ='delayed',
+                extended_hours='true'):
         """
         Fetches Simple Moving Average (SMA) data for a given symbol using specified parameters. The method
         uses additional options such as time periods, intervals, series type, entitlement level, and extended
@@ -209,9 +213,11 @@ class ApiClient:
             Any error(s) raised are based on the implementation of the `get_data` method invoked. Errors
             could include invalid parameters, connectivity issues, or API-level exceptions.
         """
-        return self.get_data('SMA', symbol, time_period=time_period, interval=interval, series_type=series_type, entitlement=entitlement, extended_hours=extended_hours, month=month)
+        return self.get_data('SMA', symbol, time_period=time_period, interval=interval, series_type=series_type,
+                             entitlement=entitlement, extended_hours=extended_hours, month=month)
 
-    def get_macd(self, symbol, month=None, interval='60min', series_type='close', entitlement ='delayed', extended_hours='true'):
+    def get_macd(self, symbol, month=None, interval='60min', series_type='close', entitlement ='delayed',
+                 extended_hours='true'):
         """
         Fetches the Moving Average Convergence Divergence (MACD) indicator for a specified
         symbol and returns its data. The method uses the given parameters to customize
@@ -230,9 +236,11 @@ class ApiClient:
         Returns:
             Any: The MACD data for the specified symbol and configuration.
         """
-        return self.get_data('MACD', symbol, interval=interval, series_type=series_type, entitlement=entitlement, extended_hours=extended_hours, month=month)
+        return self.get_data('MACD', symbol, interval=interval, series_type=series_type, entitlement=entitlement,
+                             extended_hours=extended_hours, month=month)
 
-    def get_rsi(self, symbol, month=None, time_period=200, interval='60min', series_type='close',  entitlement ='delayed', extended_hours='true'):
+    def get_rsi(self, symbol, month=None, time_period=200, interval='60min', series_type='close',  entitlement ='delayed',
+                extended_hours='true'):
         """
         Calculate the Relative Strength Index (RSI) for a given financial instrument. The RSI is a momentum oscillator
         that measures the speed and change of price movements. It is often used to identify overbought or oversold
@@ -266,9 +274,11 @@ class ApiClient:
         ValueError
             If any of the input parameters are invalid or do not meet the requirements of the data provider API.
         """
-        return self.get_data('RSI', symbol, time_period=time_period, interval=interval, series_type=series_type, entitlement=entitlement, extended_hours=extended_hours, month=month)
+        return self.get_data('RSI', symbol, time_period=time_period, interval=interval, series_type=series_type,
+                             entitlement=entitlement, extended_hours=extended_hours, month=month)
 
-    def get_news_sentiment(self, topics='economy_macro', time_from='20240410T0130', time_to='20240415T0130', limit=1000, sort='RELEVANCE'):
+    def get_news_sentiment(self, topics='economy_macro', time_from='20240410T0130', time_to='20240415T0130', limit=1000,
+                           sort='RELEVANCE'):
         """
         Retrieve sentiment analysis data for news articles based on specified criteria.
 
@@ -293,4 +303,5 @@ class ApiClient:
             Any: The fetched data containing news sentiment analysis information,
             formatted according to the specified parameters.
         """
-        return self.get_data('NEWS_SENTIMENT', None, topics=topics, time_from=time_from, time_to=time_to, limit=limit, sort=sort)
+        return self.get_data('NEWS_SENTIMENT', None, topics=topics, time_from=time_from, time_to=time_to,
+                             limit=limit, sort=sort)
