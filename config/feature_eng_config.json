@@ -82,7 +82,8 @@
     "advanced_indicators":{
         "intraday_volatility": true,
         "volume_ratio": true,
-        "price_trend": true
+        "price_trend": true,
+        "previous_hours_target": true
     },
     "cycle_analysis":{
         "monthly_cycle": true,

@@ -260,6 +260,9 @@ class FeatureEngineering:
         if self.config['advanced_indicators'].get('price_trend', False):
             self.add_price_trend()
 
+        if self.config['advanced_indicators'].get("previous_hours_target", False):
+            self.add_previous_targets()
+
         # Cycle analysis
         if self.config['cycle_analysis'].get('monthly_cycle', False):
             self.add_monthly_cycle()
@@ -393,3 +396,28 @@ class FeatureEngineering:
         self.df['cumulative_change_in_volume'] = self.df['volume'].cumsum().round(4)
         return self.df
 
+    def add_previous_targets(self):
+        """
+        Adds columns for previous target values to the DataFrame if enabled in the configuration.
+
+        This method checks the configuration dictionary for the 'previous_hours_target'
+        option under 'advanced_indicators'. If the option is set to True, it will add
+        new columns to the DataFrame containing the shifted close values for the last
+        five hours.
+
+        Args:
+            None
+
+        Raises:
+            None
+
+        Returns:
+            pandas.DataFrame: DataFrame containing the new columns for previous target
+            values, if the feature is enabled in the configuration. Otherwise, the
+            original DataFrame is returned unchanged.
+        """
+        if self.config['advanced_indicators'].get("previous_hours_target", False):
+            for i in range(1, 6):
+                self.df[f"target-{i}"] = self.df["close"].shift(i)
+
+        return self.df

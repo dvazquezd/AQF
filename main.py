@@ -1,11 +1,12 @@
 import os
 import sys
-import loader.loader as loader
-import gen_dataset.GenDataset as GenDataset
-from utils.ConfigLogger import ConfigLogger
 import utils.utils as ut
 import utils.eda as eda
 import model.RunModel as RunModel
+import loader.loader as loader
+import gen_dataset.GenDataset as GenDataset
+from utils.ConfigLogger import ConfigLogger
+
 
 def main():
     """
