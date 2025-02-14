@@ -1,5 +1,5 @@
 import pandas as pd
-from utils.utils import load_config
+import utils.utils as ut
 
 class CheckNewsDataset:
     def __init__(self, df, target_ticker):
@@ -19,7 +19,7 @@ class CheckNewsDataset:
             df (DataFrame): The input pandas DataFrame to be processed.
             target_ticker (str): The ticker symbol to filter the input DataFrame by.
         """
-        self.config = load_config('gen_dataset_config')
+        self.config = ut.load_config('gen_dataset_config')
         self.target_ticker = target_ticker
         self.original_df = df.copy()
         self.df = self.filter_by_ticker()

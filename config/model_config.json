@@ -1,0 +1,29 @@
+{
+  "dataset_balance":{
+        "undersampling": true,
+        "smote": false
+    },
+    "use_scaler":{
+      "standard_scaler": false,
+      "min_max_scaler": false
+    },
+    "ml_model":{
+      "LogisticRegression": false,
+      "svm": false,
+      "neural_network": false,
+      "knn": false,
+      "pca": false,
+      "DecisionTreeClassifier": true,
+      "RandomForestClassifier": true,
+      "xgboost": false
+    },
+    "RandomForestClassifier": {
+      "n_estimators": 100,
+      "max_depth": 10,
+      "random_state": 42
+    },
+    "models_need_scaling": ["LogisticRegression", "svm", "neural_network", "knn","pac"],
+    "applied_model":{
+      "name": "xgboost"
+    }
+}

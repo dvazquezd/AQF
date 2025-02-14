@@ -1,9 +1,12 @@
 import os
 import sys
+import utils.utils as ut
+import utils.eda as eda
+import model.RunModel as RunModel
 import loader.loader as loader
 import gen_dataset.GenDataset as GenDataset
 from utils.ConfigLogger import ConfigLogger
-import utils.eda as eda
+
 
 def main():
     """
@@ -26,13 +29,20 @@ def main():
     # Saving configuration execution in 'data/config_history.csv'
     config_logger = ConfigLogger(output_dir='data')
     config_logger.log_config()
+    config = ut.load_config('main_config')
 
     dataframes = loader.run_loader()
-    df_aqf, balance_needed = GenDataset.run_gen_dataset(dataframes)
+    df_aqf = GenDataset.run_gen_dataset(dataframes)
 
     df_aqf.to_csv('data/df_aqf.csv',encoding='utf-8',index=False)
 
-    eda.run_eda(df_aqf)
+    if config.get('exec_eda', False):
+        eda.run_eda(df_aqf)
+
+    x_train, x_test, y_train, y_test = RunModel.run_model(df_aqf)
+
+    x_train.to_csv('data/x_train.csv',encoding='utf-8',index=False)
+    x_test.to_csv('data/x_test.csv',encoding='utf-8',index=False)
 
 
 if __name__ == "__main__":
