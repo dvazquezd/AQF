@@ -291,9 +291,9 @@ class ApiClient:
             topics (str): The topic or category for the news articles. Defaults to
                 'economy_macro'.
             time_from (str): The start of the time range for fetching news sentiment
-                data, specified in the format 'YYYYMMDDTHHMM'.
+                data, specified in the format 'YYYY-MM-DD THH:MM'.
             time_to (str): The end of the time range for fetching news sentiment
-                data, specified in the format 'YYYYMMDDTHHMM'.
+                data, specified in the format 'YYYY-MM-DD THH:MM'.
             limit (int): The maximum number of news sentiment data entries to be
                 returned. Defaults to 1000.
             sort (str): The criteria by which the results should be sorted. Defaults

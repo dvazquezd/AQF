@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock
 import pandas as pd
-from loader.DataLoader import load_data
+from loader.data_loader import load_data
 
 @pytest.fixture
 def mock_client():

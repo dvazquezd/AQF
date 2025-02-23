@@ -53,7 +53,7 @@ class CheckTecDataset:
 
         return self.df
 
-    def apply_economic_indicators(self):
+    def drop_economic_indicators(self):
         """
         apply_economic_indicators(self)
 
@@ -69,7 +69,7 @@ class CheckTecDataset:
             raise ValueError('The technical dataset is empty or has not been initialized correctly')
 
         # Retrieve economic indicators from the configuration
-        for indicator, enabled in self.config['tec_economic_indicators'].items():
+        for indicator, enabled in self.config['drop_economic_indicators'].items():
             if not enabled and indicator in self.df.columns:
                 self.df.drop(columns=[indicator], inplace=True)
 
@@ -87,15 +87,15 @@ class CheckTecDataset:
             pandas.DataFrame: A DataFrame with the computed technical indicators
             appended or updated.
         """
-        if self.config['tec_calculate_indicators'].get('sma', False):
+        if self.config['tec_calculate_missing_indicators'].get('sma', False):
             for period in [5, 10, 12]:
                 self.df = self.calculate_sma_partial(period)
 
-        if self.config['tec_calculate_indicators'].get('rsi', False):
+        if self.config['tec_calculate_missing_indicators'].get('rsi', False):
             for period in [5, 7, 9]:
                 self.df = self.calculate_rsi_partial(period)
 
-        if self.config['tec_calculate_indicators'].get('macd', False):
+        if self.config['tec_calculate_missing_indicators'].get('macd', False):
             self.df = self.calculate_macd_partial()
 
         return self.df
@@ -527,11 +527,11 @@ class CheckTecDataset:
 
         self.df['is_premarket'] = self.df['time'].between(4, 9, inclusive='both').astype(int)
         self.df['is_market'] = self.df['time'].between(10, 16, inclusive='both').astype(int)
-        self.df['is_postmarket'] = self.df['time'].between(17, 20, inclusive='both').astype(int)
+        self.df['is_post_market'] = self.df['time'].between(17, 20, inclusive='both').astype(int)
 
         # Set indicators to zero outside working hours and on weekends
-        self.df.loc[self.df['is_weekend'] == 1, ['is_premarket', 'is_market', 'is_postmarket']] = 0
-        self.df.loc[~self.df['time'].between(4, 20, inclusive='both'), ['is_premarket', 'is_market', 'is_postmarket']] = 0
+        self.df.loc[self.df['is_weekend'] == 1, ['is_premarket', 'is_market', 'is_post_market']] = 0
+        self.df.loc[~self.df['time'].between(4, 20, inclusive='both'), ['is_premarket', 'is_market', 'is_post_market']] = 0
 
         return self.df
 

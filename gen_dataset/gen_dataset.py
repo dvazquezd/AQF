@@ -1,10 +1,11 @@
 import os
 import sys
+import utils.utils as ut
 from utils.utils import get_time_now
-from gen_dataset.CheckNewsDataset import CheckNewsDataset
-from gen_dataset.CheckTecDataset import CheckTecDataset
-from gen_dataset.DatasetGenerator import DatasetGenerator
-from gen_dataset.FeatureEngineering import FeatureEngineering
+from gen_dataset.check_news_dataset import CheckNewsDataset
+from gen_dataset.check_tec_dataset import CheckTecDataset
+from gen_dataset.dataset_generator import DatasetGenerator
+from gen_dataset.feature_engineering import FeatureEngineering
 
 
 def feature_engineering(fe):
@@ -31,6 +32,7 @@ def feature_engineering(fe):
     fe.add_lags()
     fe.add_advanced_features()
     fe.add_moving_avg()
+    fe.encode_temporal_features()
     fe.delete_no_necessary_col()
 
     return fe
@@ -98,7 +100,7 @@ def check_tec_dataset(checker):
         The modified checker instance after performing all operations and
         modifications on the dataset.
     """
-    checker.apply_economic_indicators()
+    checker.drop_economic_indicators()
     checker.calculate_missing_indicators()
     checker.apply_date_time_actions()
     checker.apply_corrections()
@@ -128,8 +130,11 @@ def run_gen_dataset(dfs):
     """
     print(f'{get_time_now()} :: Dataset Generation: Starting dataset generation')
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-    tec_checker = CheckTecDataset(dfs['tec_info'])
-    news_checker = CheckNewsDataset(dfs['news'],tec_checker.target_ticker)
+    df_tec = ut.ensure_correct_dtypes(dfs['tec_info'],'tec')
+    df_news = ut.ensure_correct_dtypes(dfs['news'],'news')
+
+    tec_checker = CheckTecDataset(df_tec)
+    news_checker = CheckNewsDataset(df_news,tec_checker.target_ticker)
 
     tec = check_tec_dataset(tec_checker)
     news = check_news_dataset(news_checker)
