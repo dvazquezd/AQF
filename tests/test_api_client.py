@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, MagicMock
-from loader.ApiClient import ApiClient
+from loader.api_client import ApiClient
 
 # Configuración de variables globales para el test
 API_KEY = "test_api_key"

@@ -4,25 +4,26 @@ import utils.utils as ut
 class CheckNewsDataset:
     def __init__(self, df, target_ticker):
         """
-        Initializes the DatasetGenerator class with a DataFrame and a target ticker.
+        This class is responsible for managing and processing a financial dataset. It provides
+        functionality to filter the dataset based on a specific target stock ticker and store
+        the filtered data along with other related configurations and properties.
 
         Attributes:
-            config (dict): Configuration dictionary loaded from the
-                'gen_dataset_config' file.
-            target_ticker (str): The ticker symbol that is the focus of the dataset.
-            original_df (DataFrame): A copy of the input pandas DataFrame provided
-                during initialization.
-            df (DataFrame): A filtered pandas DataFrame containing only rows that
-                correspond to the specified target ticker.
+            config (dict): A dictionary containing configuration settings loaded at initialization.
+            target_ticker (str): The stock ticker used to filter the dataset.
+            original_df (pandas.DataFrame): A copy of the original input dataframe before filtering.
+            df (pandas.DataFrame): The filtered dataframe containing only the rows related to the
+            target stock ticker.
 
-        Parameters:
-            df (DataFrame): The input pandas DataFrame to be processed.
-            target_ticker (str): The ticker symbol to filter the input DataFrame by.
+        Args:
+            df (pandas.DataFrame): The input dataframe containing financial data.
+            target_ticker (str): The stock ticker to filter the dataset by.
         """
         self.config = ut.load_config('gen_dataset_config')
         self.target_ticker = target_ticker
         self.original_df = df.copy()
-        self.df = self.filter_by_ticker()
+        self.filtered_df = self.filter_by_ticker()
+        self.df = pd.DataFrame()
 
     def filter_by_ticker(self):
         """
@@ -37,30 +38,58 @@ class CheckNewsDataset:
             matches the target ticker value.
         """
         # Filter news for the target ticker and create a copy
-        self.df = self.original_df[self.original_df['ticker'] == self.target_ticker].copy()
+        self.filtered_df = (self.original_df[self.original_df['ticker'] == self.target_ticker]).copy()
 
-        return self.df
+        return self.filtered_df
 
     def generate_ticker_features(self):
         """
-        Processes and transforms the DataFrame associated with an instance to generate ticker-level
-        features by performing numeric conversions, aggregations, and renaming columns for clarity.
+        """
+        if self.config['generate_ticker_features'].get('weight_ticker_value',False):
+            self.df = self.weight_ticker_metrics()
+        if self.config['generate_ticker_features'].get('average_ticker_value',False):
+            self.df = self.average_ticker_value()
 
-        Raises:
-            KeyError: If any required column is missing in the DataFrame.
-
-        Returns:
-            pd.DataFrame: A processed DataFrame with aggregated and renamed columns, sorted by datetime.
+    def weight_ticker_metrics(self):
+        """
         """
         # Ensure that the columns required for numerical calculations are of the appropriate type
+        df = self.filtered_df.copy()
         numeric_columns = ['overall_sentiment_score', 'relevance_score', 'ticker_sentiment_score',
                            'affected_topic_relevance_score']
         for col in numeric_columns:
-            if col in self.df.columns:
-                self.df[col] = pd.to_numeric(self.df[col], errors='coerce')
+            if col in self.filtered_df.columns:
+                self.filtered_df[col] = pd.to_numeric(self.filtered_df[col], errors='coerce')
 
-        # Group by hour and calculate aggregates.
-        self.df = self.df.groupby('datetime').agg({
+        # Weight metrics by `relevance_score`
+        df['w_ticker_ossm'] = self.filtered_df['overall_sentiment_score'] * self.filtered_df['relevance_score']
+        df['w_ticker_ssm'] = self.filtered_df['ticker_sentiment_score'] * self.filtered_df['relevance_score']
+        df['w_ticker_atrsm'] = self.filtered_df['affected_topic_relevance_score'] * self.filtered_df[
+            'relevance_score']
+
+        df = df.groupby('datetime').agg({
+            'w_ticker_ossm': lambda x: round(x.sum() / max(x.count(), 1), 6),
+            'w_ticker_ssm': lambda x: round(x.sum() / max(x.count(), 1), 6),
+            'w_ticker_atrsm': lambda x: round(x.sum() / max(x.count(), 1), 6),
+            'title': 'nunique'  # Number of unique news articles per hour
+        }).reset_index()
+        df = df.rename(columns={'title': 'w_ticker_nc'})
+        df = df.sort_values(by='datetime')
+        self.df = self.intermediate_dataset(df)
+
+        return self.df
+
+    def average_ticker_value(self):
+        """
+        """
+        df = self.filtered_df.copy()
+        numeric_columns = ['overall_sentiment_score', 'relevance_score', 'ticker_sentiment_score',
+                           'affected_topic_relevance_score']
+        for col in numeric_columns:
+            if col in self.filtered_df.columns:
+                self.filtered_df[col] = pd.to_numeric(self.filtered_df[col], errors='coerce')
+
+        df = df.groupby('datetime').agg({
             'overall_sentiment_score': lambda x: round(x.mean(), 6),
             'relevance_score': lambda x: round(x.mean(), 6),
             'ticker_sentiment_score': lambda x: round(x.mean(), 6),
@@ -69,12 +98,14 @@ class CheckNewsDataset:
         }).reset_index()
 
         # Rename the count column for better clarity.
-        self.df = self.df.rename(columns={'overall_sentiment_score': 'ticker_ossm'})
-        self.df = self.df.rename(columns={'relevance_score': 'ticker_rsm'})
-        self.df = self.df.rename(columns={'ticker_sentiment_score': 'ticker_ssm'})
-        self.df = self.df.rename(columns={'affected_topic_relevance_score': 'ticker_atrsm'})
-        self.df = self.df.rename(columns={'title': 'ticker_nc'})
-        self.df = self.df.sort_values(by='datetime')
+        df = df.rename(columns={'overall_sentiment_score': 'avg_ticker_ossm'})
+        df = df.rename(columns={'relevance_score': 'avg_ticker_rsm'})
+        df = df.rename(columns={'ticker_sentiment_score': 'avg_ticker_ssm'})
+        df = df.rename(columns={'affected_topic_relevance_score': 'avg_ticker_atrsm'})
+        df = df.rename(columns={'title': 'avg_ticker_nc'})
+        df = df.sort_values(by='datetime')
+
+        self.df = self.intermediate_dataset(df)
 
         return self.df
 
@@ -124,12 +155,7 @@ class CheckNewsDataset:
                 df = self._calculate_topic_metrics(topic)
                 self.df = self.intermediate_dataset(df)
 
-        self.df = self.df.fillna(0)
-
-    def intermediate_dataset(self,df):
-        if self.df is None:
-            return df
-        return pd.merge(self.df, df, on='datetime', how='outer')
+        return self.df.fillna(0)
 
     def _calculate_topic_metrics(self, topic):
         """
@@ -191,26 +217,23 @@ class CheckNewsDataset:
 
     def generate_news_global_metrics(self):
         """
-        Generate aggregated global metrics for news data.
-
-        This function processes the original dataframe to compute global metrics such
-        as the overall sentiment score mean and relevance score mean for each datetime,
-        aggregated across all news items. The processed metrics are then transformed
-        into an intermediate dataset for further use.
-
-        Args:
-            None
-
-        Returns:
-            pd.DataFrame: The dataframe containing aggregated global metrics for news data
-            with columns for datetime, all_news_ossm (overall sentiment score mean), and
-            all_news_rsm (relevance score mean).
         """
-        news_data = self.original_df[
-            ['datetime', 'title', 'overall_sentiment_score', 'relevance_score']].drop_duplicates()
+        df_ticker = self.filter_by_ticker().copy()
+        df_ticker = \
+        df_ticker.drop_duplicates(subset=['title', 'datetime', 'relevance_score', 'ticker_sentiment_score'])[
+            ['title', 'datetime', 'relevance_score', 'ticker_sentiment_score']
+        ]
+
+        df_ticker['relevance_score'] = pd.to_numeric(df_ticker['relevance_score'], errors='coerce')
+        df_ticker['ticker_sentiment_score'] = pd.to_numeric(df_ticker['ticker_sentiment_score'], errors='coerce')
+
+        df_ticker['ticker_score'] = (df_ticker['relevance_score'] * df_ticker['ticker_sentiment_score']) * 5
+        df_ticker = df_ticker.groupby('datetime', as_index=False).agg({'ticker_score': 'sum'})
+        df_ticker = df_ticker.sort_values(by='datetime', ascending=True)
+
+        news_data = self.original_df[['datetime', 'title', 'overall_sentiment_score', 'relevance_score']].drop_duplicates()
         news_data[['overall_sentiment_score', 'relevance_score']] = news_data[
             ['overall_sentiment_score', 'relevance_score']].apply(pd.to_numeric, errors='coerce')
-
         global_metrics = news_data.groupby('datetime').agg({
             'overall_sentiment_score': lambda x: round(x.mean(), 6),
             'relevance_score': lambda x: round(x.mean(), 6)
@@ -219,6 +242,34 @@ class CheckNewsDataset:
             'relevance_score': 'all_news_rsm'
         }).reset_index()
 
-        self.df = self.intermediate_dataset(global_metrics)
+        global_metrics['global_score'] = global_metrics['all_news_ossm'] * global_metrics['all_news_rsm']
+
+        df_fn = pd.merge(global_metrics, df_ticker, on='datetime', how='outer')
+        df_fn['ticker_score'] = df_fn['ticker_score'].fillna(0)
+        df_fn['global_score'] = df_fn['global_score'].fillna(0)
+
+        df_fn = df_fn[['datetime', 'global_score', 'ticker_score']]
+        self.df = self.intermediate_dataset(df_fn)
 
         return self.df
+
+    def intermediate_dataset(self,df):
+        """
+        Merges two datasets based on the 'datetime' column.
+
+        This function takes an input dataframe and performs an outer join with
+        the instance's dataframe based on the 'datetime' column. It is useful
+        for combining datasets where you want to retain all rows from both
+        dataframes, aligning on the 'datetime' column.
+
+        Args:
+            df (pd.DataFrame): The dataframe to be merged with the current
+            instance's dataframe.
+
+        Returns:
+            pd.DataFrame: A merged dataframe containing all rows from both
+            dataframes, aligned on the 'datetime' column.
+        """
+        if self.df is None or self.df.empty:
+            return df.copy()
+        return pd.merge(self.df, df, on='datetime', how='outer')

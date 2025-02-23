@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-from loader.DataLoader import combine_dataframes, combine_data
+from loader.data_loader import combine_dataframes, combine_data
 
 @pytest.fixture
 def sample_dataframes():

@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock
 import pandas as pd
-from loader.DataLoader import load_economics
+from loader.data_loader import load_economics
 
 @pytest.fixture
 def mock_client():

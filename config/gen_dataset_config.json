@@ -6,7 +6,7 @@
         "moving_average": false,
         "mark_incomplete_days": true
     },
-    "tec_calculate_indicators": {
+    "tec_calculate_missing_indicators": {
         "sma": true,
         "rsi": true,
         "macd": true
@@ -24,24 +24,18 @@
         "closing_moving_avg": true,
         "cumulative_change_in_volume": true
     },
-    "tec_economic_indicators":{
+    "drop_economic_indicators":{
         "cpi": false,
         "nonfarm_payroll": false,
         "unemployment": false
     },
-    "news_ticker_features": {
-        "avg_sentiment_score": true,
-        "sentiment_proportions": true,
-        "avg_relevance_score": true,
-        "news_count": true,
-        "sentiment_change": true
-    },
+    "generate_topic_features": true,
     "news_topic_features": {
         "blockchain":  false,
         "earnings":  false,
         "ipo": false,
         "mergers_and_acquisitions": false,
-        "financial_markets": false,
+        "financial_markets": true,
         "economy_macro": false,
         "economy_monetary": false,
         "economy_fiscal": false,
@@ -55,12 +49,16 @@
     },
     "news_aggregate_hours": {
         "aggregate_news_execute": true,
-        "aggregate_news_horus": 5
+        "aggregate_news_horus": 3
     },
     "global_date_time_actions": {
         "date_split": true,
         "fill_missing_days": true,
         "fill_missing_hours": true,
         "add_temporal_features": true
+    },
+    "generate_ticker_features": {
+        "weight_ticker_value": true,
+        "average_ticker_value": true
     }
 }

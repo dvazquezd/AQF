@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-from loader.DataTransformer import manage_dates, transform_intraday
+from loader.data_transform import manage_dates, transform_intraday
 
 @pytest.fixture
 def sample_dataframe():

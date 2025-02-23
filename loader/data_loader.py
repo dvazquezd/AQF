@@ -1,7 +1,6 @@
 import pandas as pd
 import utils.utils as ut
-import loader.DataTransformer as Transformer
-from datetime import datetime
+import loader.data_transform as transformer
 from utils.utils import get_time_now
 
 def combine_dataframes(df_historical, df_current, f_dataframes, combine_configuration):
@@ -99,24 +98,24 @@ def load_data(dfs, client, symbols, months, periods):
             # Fetch and transform ticker data
             json_data_ticker = client.get_intraday_data(symbol, month)
             if json_data_ticker:
-                h_ticker = Transformer.transform_intraday(symbol, json_data_ticker)
+                h_ticker = transformer.transform_intraday(symbol, json_data_ticker)
                 dfs['ticker'] = combine_data(dfs['ticker'], h_ticker, subset_columns=['ticker', 'datetime'])
 
             json_data_macd = client.get_macd(symbol, month)
             if json_data_macd:
-                h_macd = Transformer.transform_macd(symbol, json_data_macd)
+                h_macd = transformer.transform_macd(symbol, json_data_macd)
                 dfs['macd'] = combine_data(dfs['macd'], h_macd, subset_columns=['ticker', 'datetime'])
 
             for period in periods['sma']:
                 json_data_sma = client.get_sma(symbol, month, period)
                 if json_data_sma:
-                    h_sma = Transformer.transform_sma(symbol, json_data_sma, period)
+                    h_sma = transformer.transform_sma(symbol, json_data_sma, period)
                     dfs['sma'] = combine_data(dfs['sma'], h_sma, subset_columns=['ticker', 'datetime', 'period'])
 
             for period in periods['rsi']:
                 json_data_rsi = client.get_rsi(symbol, month, period)
                 if json_data_rsi:
-                    h_rsi = Transformer.transform_rsi(symbol, json_data_rsi, period)
+                    h_rsi = transformer.transform_rsi(symbol, json_data_rsi, period)
                     dfs['rsi'] = combine_data(dfs['rsi'], h_rsi, subset_columns=['ticker', 'datetime', 'period'])
 
     return dfs
@@ -143,7 +142,7 @@ def load_economics(dfs, client, indicators):
         print(f'{get_time_now()} :: Getting data: {{\'function\': {indicator}}}')
         json_data = client.get_economic_indicator(indicator)
         if json_data:
-            df_economic = Transformer.transform_economic_data(json_data)
+            df_economic = transformer.transform_economic_data(json_data)
             ut.write_csv(df_economic, f'data/df_{indicator}.csv')
             dfs[indicator] = df_economic
             print(f'{get_time_now()} :: Getting data: {{\'function\': {indicator}}} saved successfully!')
@@ -179,7 +178,7 @@ def load_news(dfs, client, months, topics):
             time_from, time_to = ut.get_time_range(month)
             json_data = client.get_news_sentiment(topic, time_from, time_to)
             if json_data is not None:
-                h_news = Transformer.transform_news_data(json_data, topic)
+                h_news = transformer.transform_news_data(json_data, topic)
                 dfs['news'] = combine_data(dfs['news'], h_news, subset_columns=['title', 'datetime', 'ticker',
                                                                                 'affected_topic'])
 

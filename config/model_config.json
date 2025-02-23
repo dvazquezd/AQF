@@ -1,6 +1,6 @@
 {
   "dataset_balance":{
-        "undersampling": true,
+        "under_sampling": true,
         "smote": false
     },
     "use_scaler":{

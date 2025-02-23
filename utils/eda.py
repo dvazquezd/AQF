@@ -1,4 +1,3 @@
-
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -24,10 +23,10 @@ def inspect_dataset(df):
     print(f'\n{get_time_now()} :: EDA: Dataset general info:')
     print(df.info())
 
-    print("\n Descriptive statistics:")
+    print('\n Descriptive statistics:')
     print(df.describe())
 
-    print("\n NaN per column:")
+    print('\n NaN per column:')
     print(df.isnull().sum())
 
 def plot_target_distribution(df):
@@ -46,10 +45,10 @@ def plot_target_distribution(df):
         KeyError: If the 'target' column is not found in the provided DataFrame.
     """
     plt.figure(figsize=(6, 4))
-    sns.countplot(x=df["target"], hue=df["target"], palette="coolwarm", legend=False)
-    plt.title("Distribución del Target (0 = Baja, 1 = Sube)")
-    plt.xlabel("Target")
-    plt.ylabel("Cantidad de Registros")
+    sns.countplot(x=df['target'], hue=df['target'], palette='coolwarm', legend=False)
+    plt.title('Target distribution (0 = Down, 1 = Up)')
+    plt.xlabel('Target')
+    plt.ylabel('Register count')
     plt.show()
 
 def plot_pearson_correlation_matrix(df):
@@ -78,15 +77,15 @@ def plot_pearson_correlation_matrix(df):
 
     # Verificar que haya columnas numéricas antes de graficar
     if numeric_df.empty:
-        print("No hay columnas numéricas en el dataset para calcular la correlación.")
+        print('No hay columnas numéricas en el dataset para calcular la correlación.')
         return
 
     # Calcular y graficar la matriz de correlación
     plt.figure(figsize=(18, 12))
     corr_matrix = numeric_df.corr()
-    sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap="coolwarm", linewidths=0.5, annot_kws={"size": 8})
+    sns.heatmap(corr_matrix, annot=True, fmt='.2f', cmap='coolwarm', linewidths=0.5, annot_kws={'size': 8})
 
-    plt.title("Pearson correlation matrix - numeric variables")
+    plt.title('Pearson correlation matrix - numeric variables')
     plt.show()
 
 def plot_price_trend(df):
@@ -107,11 +106,11 @@ def plot_price_trend(df):
         None
     """
     plt.figure(figsize=(12, 5))
-    df["datetime"] = pd.to_datetime(df["datetime"])
-    plt.plot(df["datetime"], df["close"], label="Precio de Cierre", color="blue")
-    plt.title("Evolución del Precio de Cierre")
-    plt.xlabel("Fecha")
-    plt.ylabel("Precio")
+    df['datetime'] = pd.to_datetime(df['datetime'])
+    plt.plot(df['datetime'], df['close'], label='Precio de Cierre', color='blue')
+    plt.title('Evolución del Precio de Cierre')
+    plt.xlabel('Fecha')
+    plt.ylabel('Precio')
     plt.legend()
     plt.xticks(rotation=45)
     plt.show()
@@ -144,10 +143,10 @@ def plot_technical_indicators(df):
     pandas.DataFrame.hist : Method to plot histograms from DataFrame data.
     matplotlib.pyplot.suptitle : Sets a super title for the entire figure in Matplotlib.
     """
-    indicators = ["rsi_5", "rsi_7", "rsi_9", "sma_5", "sma_10", "sma_12", "MACD"]
+    indicators = ['rsi_5', 'rsi_7', 'rsi_9', 'sma_5', 'sma_10', 'sma_12', 'MACD']
     if indicators[0] in df.columns:
-        df[indicators].hist(figsize=(12, 8), bins=30, edgecolor="black")
-        plt.suptitle("Distribución de Indicadores Técnicos", fontsize=14)
+        df[indicators].hist(figsize=(12, 8), bins=30, edgecolor='black')
+        plt.suptitle('Distribución de Indicadores Técnicos', fontsize=14)
         plt.show()
 
 def plot_economic_indicators(df):
@@ -171,11 +170,11 @@ def plot_economic_indicators(df):
      Raises:
          None
     """
-    economic_vars = ["cpi", "unemployment", "nonfarm_payroll"]
+    economic_vars = ['cpi', 'unemployment', 'nonfarm_payroll']
     if all(col in df.columns for col in economic_vars):
         plt.figure(figsize=(10, 6))
         sns.boxplot(data=df[economic_vars])
-        plt.title("Boxplot de Indicadores Económicos")
+        plt.title('Boxplot de Indicadores Económicos')
         plt.xticks(rotation=20)
         plt.show()
 
@@ -199,15 +198,15 @@ def plot_sentiment_vs_target(df):
     ValueError
         If the input DataFrame does not contain the necessary column 'ticker_ssm'.
     """
-    if "ticker_ssm" in df.columns:
+    if 'ticker_score' in df.columns:
         plt.figure(figsize=(10, 5))
-        sns.scatterplot(x=df["ticker_ssm"], y=df["target"], alpha=0.5)
-        plt.title("Relación entre Sentimiento y Target (Sube/Baja)")
-        plt.xlabel("Sentimiento Promedio del Ticker")
-        plt.ylabel("Target (0 = Baja, 1 = Sube)")
+        sns.scatterplot(x=df['ticker_score'], y=df['target'], alpha=0.5)
+        plt.title('News target relation (Up/Down)')
+        plt.xlabel('Average ticker sentiment')
+        plt.ylabel('Target (0 = Down, 1 = Up)')
         plt.show()
     else:
-        print("❌ La columna 'ticker_ssm' no está en el dataset.")
+        print('The column ticker_score is not in the dataset.')
 
 def run_eda(df):
     """
@@ -229,8 +228,8 @@ def run_eda(df):
         TypeError: If the provided argument is not a pandas DataFrame.
     """
     if df is not None:
-        #inspect_dataset(df)
-        #plot_target_distribution(df)
+        inspect_dataset(df)
+        plot_target_distribution(df)
         plot_pearson_correlation_matrix(df)
         plot_price_trend(df)
         plot_technical_indicators(df)

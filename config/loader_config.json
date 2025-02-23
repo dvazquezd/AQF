@@ -12,18 +12,7 @@
         "technology",
         "financial_markets",
         "economy_macro",
-        "economy_monetary",
-        "economy_fiscal",
-        "finance",
-        "blockchain",
-        "earnings",
-        "ipo",
-        "mergers_and_acquisitions",
-        "energy_transportation",
-        "life_sciences",
-        "manufacturing",
-        "real_estate",
-        "retail_wholesale"
+        "blockchain"
     ],
     "dataframes": {
         "ticker": {},

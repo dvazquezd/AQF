@@ -1,6 +1,5 @@
 import os
 import json
-import pandas as pd
 from datetime import datetime, timedelta
 
 def load_config(config_file):
@@ -149,34 +148,34 @@ def dataframes_creator(names):
 
 def get_time_range(year_month):
     """
-        Generate start and end timestamps for a given year and month.
+    Generate start and end timestamps for a given year and month.
 
-        This function takes a string representing year and month in the format
-        "YYYY-MM" and returns the start and end timestamps for that month, formatted
-        as strings in 'YYYY-MM-DD T HHMM' format. The start timestamp corresponds to
-        the first day of the month at '00:00', while the end timestamp corresponds
-        to the last day of the month at '23:59'.
+    This function takes a string representing year and month in the format
+    "YYYY-MM" and returns the start and end timestamps for that month, formatted
+    as strings in 'YYYY-MM-DD T HHMM' format. The start timestamp corresponds to
+    the first day of the month at '00:00', while the end timestamp corresponds
+    to the last day of the month at '23:59'.
 
-        The function utilizes Python's `datetime` and `timedelta` modules to compute
-        the timestamps, accounting for edge cases such as the end of December (which
-        moves into the next year).
+    The function utilizes Python's `datetime` and `timedelta` modules to compute
+    the timestamps, accounting for edge cases such as the end of December (which
+    moves into the next year).
 
-        Parameters:
-        year_month: str
-            A string in the format "YYYY-MM" representing the desired year and month.
+    Parameters:
+    year_month: str
+        A string in the format "YYYY-MM" representing the desired year and month.
 
-        Returns:
-        tuple[str, str]
-            A tuple containing the start timestamp and end timestamp, both formatted
-            as strings in 'YYYY-MM-DD T HHMM'.
+    Returns:
+    tuple[str, str]
+        A tuple containing the start timestamp and end timestamp, both formatted
+        as strings in 'YYYY-MM-DD T HHMM'.
 
-        Raises:
-        ValueError
-            If the input string does not conform to the "YYYY-MM" format or is not a
-            valid date.
+    Raises:
+    ValueError
+        If the input string does not conform to the "YYYY-MM" format or is not a
+        valid date.
 
-        Example:
-        Raises ValueError for invalid formats or inputs like '2023-13', 'abcd-ef', etc.
+    Example:
+    Raises ValueError for invalid formats or inputs like '2023-13', 'abcd-ef', etc.
     """
     year = int(year_month[:4])
     month = int(year_month[5:])
@@ -196,20 +195,23 @@ def get_time_range(year_month):
 
 def get_months(year, historical_needed):
     """
-        Generates a list of months based on historical requirement and year provided.
+    Generate a list of months based on the specified year and whether historical data is required.
 
-        This function determines the list of months to return based on whether historical data
-        is required. If historical data is needed, it generates a list of all months for the
-        given year. Otherwise, it generates only the current month.
+    This function determines the months to be considered based on the given year
+    and a flag indicating whether historical months are needed. If historical
+    data is required, it generates a list of all months in the specified year.
+    Otherwise, it generates a list containing only the current month.
 
-        Parameters:
-        year (int): The year for which the months are to be generated if historical data is needed.
-        historical_needed (bool): A flag indicating whether to generate all months (if True)
-            or just the current month (if False).
+    Parameters:
+    year : int
+        The year for which the month list is to be generated.
+    historical_needed : bool
+        A flag indicating whether historical months are needed.
 
-        Returns:
-        list: A list of months as per the requirement (entire year if historical data is needed,
-        or current month only).
+    Returns:
+    list
+        A list containing strings of month representations either for the entire
+        year if historical data is required or for the current month.
     """
     if historical_needed:
         months = generate_month_list(year)
@@ -221,15 +223,55 @@ def get_months(year, historical_needed):
 
 def get_time_now():
     """
-    Fetch the current date and time as a formatted string.
+    A utility function to retrieve the current system date and time in a formatted string.
 
-    This function retrieves the system's current date and time and formats it
-    into a string following the 'YYYY-MM-DD HH:MM:SS' format. The returned string
-    can be used for logging, displaying timestamps in a user interface, or other
-    purposes requiring a human-readable date and time representation.
+    This function fetches the current timestamp from the system and formats it
+    in the "YYYY-MM-DD HH:MM:SS" pattern according to the local time zone. It
+    is useful where the current date and time in that specific format are
+    required.
 
     Returns:
-        str: The current date and time as a string in 'YYYY-MM-DD HH:MM:SS'
-        format.
+        str: A formatted string of the current date and time in "YYYY-MM-DD
+        HH:MM:SS" format.
     """
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+import pandas as pd
+
+def ensure_correct_dtypes(df, dataset_type):
+    """
+    Ensure that the correct data types are applied to specific columns in a DataFrame,
+    based on the provided `dataset_type`. This function modifies the DataFrame
+    in-place by converting specified columns to float. Conversion errors are coerced
+    to NaN values. It supports two dataset types: "tec" and "news".
+
+    Parameters:
+        df (pd.DataFrame): The DataFrame whose columns are to be converted.
+        dataset_type (str): The type of dataset. Determines which columns will be
+        converted to float. Acceptable values are "tec" and "news".
+
+    Returns:
+        pd.DataFrame: The DataFrame with the specified columns converted to the
+        correct data types.
+    """
+
+    if dataset_type == 'tec':
+        # Convert MACD-related fields to float
+        float_columns = ['MACD', 'MACD_Signal', 'MACD_Hist','volume']
+        for col in float_columns:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors='coerce').astype('float64')
+
+    elif dataset_type == 'news':
+        # Convert sentiment and relevance score fields to float
+        float_columns = [
+            'relevance_score',
+            'ticker_sentiment_score',
+            'affected_topic_relevance_score',
+            'technology_ossm'
+        ]
+        for col in float_columns:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors='coerce').astype('float64')
+
+    return df

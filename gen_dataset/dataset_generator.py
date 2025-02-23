@@ -87,12 +87,15 @@ class DatasetGenerator:
         """
         self.df = pd.merge(self.df_tec, self.df, on='datetime', how='left')
         if 'close' in self.df.columns:  # Ensure the 'close' column exists
-            self.df['target'] = (self.df['close'].shift(-1) > self.df['close']).astype(int)  # 1 if price goes up, 0 if it goes down
-            self.df['target_percent'] = (self.df['close'].shift(-1) / self.df['close'] - 1)
+            # 1 if price goes up, 0 if it goes down
+            self.df = self.df.sort_values(by='datetime')
+            self.df['target'] = (self.df['close'].shift(-1) > self.df['close']).astype(int)
 
             self.df['close_pct_change'] = (
                 (self.df['close'] - self.df['close'].shift(1)) / self.df['close'].shift(1)).round(6)
 
         self.df = self.df.sort_values(by='datetime').drop_duplicates(subset=['datetime'], keep='last')
+
+        self.df.to_csv('data/gen_data.csv',encoding='utf-8',index=False)
 
         return self.df

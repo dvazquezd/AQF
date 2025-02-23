@@ -1,33 +1,32 @@
-import pandas as pd
 import numpy as np
 import utils.utils as ut
-
-
 
 class FeatureEngineering:
     def __init__(self, df):
         """
-        A class to manage a dataset and perform feature engineering tasks based on a
-        given configuration. Handles the original dataset, transformed dataset,
-        numeric columns, and overall column management, and allows for further
-        manipulations as defined by the loaded configuration settings.
+        Class implementing feature engineering utilities for a dataset. It stores
+        original and transformed datasets, identifies numeric columns, and loads
+        feature engineering configurations from a specified JSON file.
 
         Attributes:
-            df_original (DataFrame): Original untouched copy of the dataset provided
-                for reference and preservation.
-            df (DataFrame): Transformed dataset copy upon which all operations and
-                transformations are executed.
-            config (dict): Configuration dictionary loaded from a JSON file specifying
-                parameters for feature engineering tasks.
-            numeric_columns (list[str]): List of column names that are of numeric data
-                type from the dataset being managed.
-            all_columns (list[str]): List of all column names present in the dataset.
+        df_original (DataFrame): The original unmodified dataframe provided at
+            initialization.
+        df (DataFrame): The dataframe on which transformation operations are applied.
+        config (dict): Configuration dictionary loaded from a JSON file, containing
+            settings for feature engineering.
+        numeric_columns (list[str]): List of column names from the dataframe that
+            contain numeric (float) data types.
+        all_columns (list[str]): List of all column names present in the dataframe.
+
+        Parameters:
+        df (DataFrame): The input dataframe to be processed. The provided dataframe
+            serves as a source for data manipulation and analysis.
         """
 
         self.df_original = df.copy()  # Save a copy of the original dataset
         self.df = df.copy()  # Dataset on which we apply transformations
         self.config = ut.load_config('feature_eng_config')  # Load the configuration from JSON
-        self.numeric_columns = self.df.select_dtypes(include=['number']).columns.tolist()
+        self.numeric_columns = self.df.select_dtypes(include=['float']).columns.tolist()
         self.all_columns = self.df.columns.tolist()
 
     def add_lags(self):
@@ -100,7 +99,7 @@ class FeatureEngineering:
 
         Parameters
         ----------
-        None
+        Non parameters are required.
 
         Returns
         -------
@@ -168,14 +167,10 @@ class FeatureEngineering:
         --------
         This section is intentionally omitted as per documentation rules.
         """
-        if 'hour' in self.df.columns:
-            self.df['hour_sin'] = np.sin(2 * np.pi * self.df['hour'] / 24)
-            self.df['hour_cos'] = np.cos(2 * np.pi * self.df['hour'] / 24)
+        if 'time' in self.df.columns:
+            self.df['hour_sin'] = np.sin(2 * np.pi * self.df['time'] / 24)
+            self.df['hour_cos'] = np.cos(2 * np.pi * self.df['time'] / 24)
 
-        if 'day_of_week' in self.df.columns:
-            self.df = pd.get_dummies(self.df, columns=['day_of_week'], prefix='dow')
-
-        print('Encoded temporal variables')
         return self
 
     def validate_features(self):
@@ -206,32 +201,24 @@ class FeatureEngineering:
 
     def delete_no_necessary_col(self):
         """
-        Deletes unnecessary columns from the dataframe based on the configuration settings.
+        Removes unnecessary columns from the dataframe and retains only the specified columns.
 
-        This method iterates through all columns in the dataframe and checks if the column
-        is marked for deletion in the configuration. If the column is marked as unnecessary,
-        it will be dropped from the dataframe.
+        This method filters the columns of the dataframe based on the specified list of
+        columns to keep. If no such list is provided, the dataframe remains unchanged.
 
-        Raises
-        ------
-        KeyError
-            If a column specified in the configuration does not exist in the dataframe.
+        Attributes:
+            df (DataFrame): The dataframe from which columns will be filtered.
+            config (dict): A dictionary containing configurations, including the
+                'columns_to_keep' key.
 
-        Parameters
-        ----------
-        self : instance of the class
-            The instance containing the dataframe (`self.df`), list of all columns
-            (`self.all_columns`), and configuration dictionary (`self.config`).
+        Returns:
+            The updated object with the filtered dataframe.
 
-        Returns
-        -------
-        self : instance of the class
-            The updated class instance with specified columns removed from the dataframe.
+        Raises:
+            KeyError: If one or more specified columns do not exist in the dataframe.
         """
-        for column_name in self.all_columns:
-            if self.config['delete_original_columns'].get(column_name, False):
-                self.df.drop(column_name, axis=1, inplace=True)
-
+        columns_to_keep = self.config.get('columns_to_keep', [])
+        self.df = self.df[columns_to_keep] if columns_to_keep else self.df
         return self
 
     def add_advanced_features(self):
@@ -288,7 +275,7 @@ class FeatureEngineering:
         decimal places and stored in a new column named 'intraday_volatility'.
 
         Args:
-            None: This method operates directly on the object's DataFrame attribute.
+            This method operates directly on the object's DataFrame attribute.
 
         Returns:
             DataFrame: The updated DataFrame with the new 'intraday_volatility' column added.
@@ -324,7 +311,7 @@ class FeatureEngineering:
         original DataFrame and returns it with the added column.
 
         Args:
-            None
+            Non arguments are required.
 
         Returns:
             pandas.DataFrame: Modified DataFrame with a new 'price_trend' column.
@@ -406,7 +393,7 @@ class FeatureEngineering:
         five hours.
 
         Args:
-            None
+            Non arguments are required.
 
         Raises:
             None
@@ -416,7 +403,7 @@ class FeatureEngineering:
             values, if the feature is enabled in the configuration. Otherwise, the
             original DataFrame is returned unchanged.
         """
-        if self.config['advanced_indicators'].get("previous_hours_target", False):
+        if self.config['advanced_indicators'].get('previous_hours_target', False):
             for i in range(1, 6):
                 self.df[f"target-{i}"] = self.df["close"].shift(i)
 
