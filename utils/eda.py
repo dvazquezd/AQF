@@ -72,15 +72,12 @@ def plot_pearson_correlation_matrix(df):
     Returns:
         None
     """
-    # Filtrar solo columnas numéricas
     numeric_df = df.select_dtypes(include=['number'])
 
-    # Verificar que haya columnas numéricas antes de graficar
     if numeric_df.empty:
-        print('No hay columnas numéricas en el dataset para calcular la correlación.')
+        print('There is not numeric columns to calculate the correlation matrix')
         return
 
-    # Calcular y graficar la matriz de correlación
     plt.figure(figsize=(18, 12))
     corr_matrix = numeric_df.corr()
     sns.heatmap(corr_matrix, annot=True, fmt='.2f', cmap='coolwarm', linewidths=0.5, annot_kws={'size': 8})
@@ -107,10 +104,10 @@ def plot_price_trend(df):
     """
     plt.figure(figsize=(12, 5))
     df['datetime'] = pd.to_datetime(df['datetime'])
-    plt.plot(df['datetime'], df['close'], label='Precio de Cierre', color='blue')
-    plt.title('Evolución del Precio de Cierre')
-    plt.xlabel('Fecha')
-    plt.ylabel('Precio')
+    plt.plot(df['datetime'], df['close'], label='Close price', color='blue')
+    plt.title('Close price evolution')
+    plt.xlabel('Date')
+    plt.ylabel('Price')
     plt.legend()
     plt.xticks(rotation=45)
     plt.show()
@@ -146,7 +143,7 @@ def plot_technical_indicators(df):
     indicators = ['rsi_5', 'rsi_7', 'rsi_9', 'sma_5', 'sma_10', 'sma_12', 'MACD']
     if indicators[0] in df.columns:
         df[indicators].hist(figsize=(12, 8), bins=30, edgecolor='black')
-        plt.suptitle('Distribución de Indicadores Técnicos', fontsize=14)
+        plt.suptitle('Technical indicators distribution', fontsize=14)
         plt.show()
 
 def plot_economic_indicators(df):
@@ -174,7 +171,7 @@ def plot_economic_indicators(df):
     if all(col in df.columns for col in economic_vars):
         plt.figure(figsize=(10, 6))
         sns.boxplot(data=df[economic_vars])
-        plt.title('Boxplot de Indicadores Económicos')
+        plt.title('Boxplot Economic indicators')
         plt.xticks(rotation=20)
         plt.show()
 

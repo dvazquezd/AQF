@@ -29,8 +29,6 @@ def main():
     dataframes = loader.run_loader()
     df_aqf = gen_dataset.run_gen_dataset(dataframes)
 
-    df_aqf.to_csv('data/df_aqf.csv',encoding='utf-8',index=False)
-
     if config.get('exec_eda', False):
         eda.run_eda(df_aqf)
 

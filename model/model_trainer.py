@@ -7,6 +7,26 @@ from model.model_utils import evaluate_model, best_threshold
 
 def train_and_evaluate(x_train, x_test, x_val, y_train, y_test, y_val, df_prediction, config):
     """
+    Trains and evaluates a machine learning model using the provided training, validation, and testing data.
+    The function selects a model based on configuration, trains it on the training dataset, evaluates its
+    performance on the testing and validation sets, and makes a prediction for the next hour's target.
+
+    Args:
+        x_train (pd.DataFrame): Training feature dataset, filtered to include only numeric columns.
+        x_test (pd.DataFrame): Testing feature dataset, filtered to include only numeric columns.
+        x_val (pd.DataFrame): Validation feature dataset, filtered to include only numeric columns.
+        y_train (pd.Series): Target labels for the training dataset.
+        y_test (pd.Series): Target labels for the testing dataset.
+        y_val (pd.Series): Target labels for the validation dataset.
+        df_prediction (pd.DataFrame): Dataset for predicting the next hour's target values, expected to
+                                        contain feature columns corresponding to the training dataset.
+        config (dict): Configuration dictionary containing hyperparameters and model selection details.
+
+    Returns:
+        object: Trained machine learning model.
+
+    Raises:
+        ValueError: If the model specified in the configuration is not recognized.
     """
     model_name = config["applied_model"]["name"]
     print(f'{ut.get_time_now()} :: Running model: Training {model_name}')
