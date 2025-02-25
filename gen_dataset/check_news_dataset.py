@@ -44,6 +44,15 @@ class CheckNewsDataset:
 
     def generate_ticker_features(self):
         """
+        This method generates ticker features based on the configuration provided. Depending on the flags set
+        in the 'generate_ticker_features' section of the configuration, it applies different operations to
+        adjust the dataframe, such as weighting ticker metrics or averaging specific ticker values.
+
+        Arguments:
+            None
+
+        Returns:
+            None
         """
         if self.config['generate_ticker_features'].get('weight_ticker_value',False):
             self.df = self.weight_ticker_metrics()
@@ -52,6 +61,39 @@ class CheckNewsDataset:
 
     def weight_ticker_metrics(self):
         """
+        Calculates and aggregates weighted ticker metrics based on sentiment and relevance scores,
+        grouping by time intervals. This method computes weighted metrics, aggregates them, and adds
+        additional statistics such as the count of unique news articles.
+
+        Parameters
+        ----------
+        This method does not take any parameters. It operates on the `self.filtered_df` attribute
+        and updates the `self.df` attribute.
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame containing the aggregated and weighted ticker metrics along with the count
+            of unique news articles, grouped by `datetime`.
+
+        Raises
+        ------
+        This method does not explicitly raise exceptions but may propagate errors from operations
+        such as data type conversion or aggregation.
+
+        Examples
+        --------
+        Examples are not provided in this documentation.
+
+        Notes
+        -----
+        - The method assumes that `self.filtered_df` contains columns necessary for calculating
+          weighted metrics: 'overall_sentiment_score', 'ticker_sentiment_score',
+          'affected_topic_relevance_score', and 'relevance_score'.
+        - Computes numerical conversions for specific columns to ensure proper aggregation and
+          processing.
+        - Weighted metrics are aggregated by finding the average per time interval, rounded to
+          six decimal places.
         """
         # Ensure that the columns required for numerical calculations are of the appropriate type
         df = self.filtered_df.copy()
@@ -217,6 +259,20 @@ class CheckNewsDataset:
 
     def generate_news_global_metrics(self):
         """
+        Generate global metrics based on news data.
+
+        This method processes and aggregates certain metrics from news data related to ticker
+        sentiment and relevance. It computes new metrics such as `ticker_score` and combines
+        them with global metrics like the overall sentiment score and relevance score across
+        the provided data. The resulting dataset is sorted, formatted, and saved as part of
+        the object's attributes.
+
+        Returns:
+            pd.DataFrame: A processed dataframe containing aggregated news-related
+            metrics, including `global_score` and `ticker_score`, indexed by datetime.
+
+        Raises:
+            None
         """
         df_ticker = self.filter_by_ticker().copy()
         df_ticker = \

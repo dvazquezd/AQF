@@ -5,16 +5,21 @@ from model.model_trainer import train_and_evaluate
 
 def run_model(df):
     """
-    Executes the full pipeline of pre-processing, modeling, and evaluation on the given dataset. The function runs through
-    a series of steps including dataset splitting, balancing, scaling, and model training/evaluation, governed by
-    configurations provided through a model configuration file.
+    Runs the process of training, evaluating, and applying the model on the provided dataset.
 
-    Args:
-        df: Input pandas DataFrame that contains input features required for model training and predictions.
+    This function performs multiple steps including loading the configuration, splitting the dataset into train,
+    test, and validation sets, balancing the training data if required, applying scaling transformations,
+    and finally training and evaluating the model. The configuration file dictates specific operations such
+    as whether scaling is necessary and other model-related parameters.
+
+    Arguments:
+        df: DataFrame containing the input data for the model.
 
     Returns:
-        tuple: A tuple containing the training feature set (x_train), test feature set (x_test), training labels (y_train),
-        and test labels (y_test) after all preprocessing steps and balancing (if applicable).
+        None.
+
+    Raises:
+        None.
     """
     print(f'{ut.get_time_now()} :: Running model: Starting running model')
 
