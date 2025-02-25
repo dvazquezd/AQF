@@ -29,14 +29,14 @@
         "price_trend","closing_moving_avg","cumulative_change_in_volume","target",
         "close_pct_change","close_ma5","volume_ma5","MACD_ma5","rsi_5_ma5","volume_lag5",
         "MACD_lag5","rsi_5_lag5","sma_5_lag5","global_score_lag5", "ticker_score_lag5",
-        "hour_sin","hour_cos","target-1", "target-2", "target-3","technology_ossm_ma5",
+        "hour_sin","hour_cos","technology_ossm_ma5",
         "technology_ossm_lag5","technology_atrsm_lag5", "technology_atrsm_ma5"
     ],
     "advanced_indicators":{
         "intraday_volatility": true,
         "volume_ratio": true,
         "price_trend": true,
-        "previous_hours_target": true
+        "previous_hours_target": false
     },
     "cycle_analysis":{
         "monthly_cycle": false,
